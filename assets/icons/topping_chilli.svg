@@ -1,0 +1,11 @@
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever Topping: Chilli -->
+  <circle cx="40" cy="40" r="34" fill="#fbf3e6" stroke="#5c3a21" stroke-width="4"/>
+  <!-- chilli pepper -->
+  <path d="M30 28 Q24 38 30 50 Q36 60 48 56 Q56 52 52 42 Q48 32 38 30 Q34 28 30 28 Z"
+        fill="#e8473a" stroke="#5c3a21" stroke-width="3" stroke-linejoin="round"/>
+  <!-- stem -->
+  <path d="M30 28 Q26 22 32 18" fill="none" stroke="#5a8a3a" stroke-width="4" stroke-linecap="round"/>
+  <!-- highlight -->
+  <ellipse cx="36" cy="38" rx="4" ry="7" fill="#f47a6b" opacity="0.7" transform="rotate(30 36 38)"/>
+</svg>

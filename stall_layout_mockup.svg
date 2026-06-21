@@ -1,0 +1,137 @@
+<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever — Stall Layout Mockup v2, 1280x720 (16:9 reference canvas) -->
+  <!-- Bands: HUD (8%) / Customer Queue (28%) / Station Row (44%) / Hotbar (12%) -->
+
+  <rect x="0" y="0" width="1280" height="720" fill="#cfe8d8"/>
+
+  <!-- ============ HUD STRIP (0-58px, ~8%) ============ -->
+  <rect x="0" y="0" width="1280" height="58" fill="#fbf3e6" stroke="#5c3a21" stroke-width="3"/>
+  <circle cx="40" cy="29" r="18" fill="#e8b14a" stroke="#5c3a21" stroke-width="3"/>
+  <text x="68" y="35" font-family="Arial" font-size="20" font-weight="bold" fill="#5c3a21">Rs. 1,240</text>
+
+  <rect x="220" y="14" width="150" height="30" rx="15" fill="#e8746a" stroke="#5c3a21" stroke-width="3"/>
+  <text x="295" y="35" font-family="Arial" font-size="15" text-anchor="middle" fill="#fff">mood ●●●○○</text>
+
+  <text x="560" y="36" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle" fill="#5c3a21">x2 COMBO</text>
+
+  <!-- booster buttons live on the HUD, right side, before the timer -->
+  <g>
+    <circle cx="700" cy="29" r="20" fill="#bcd98a" stroke="#5c3a21" stroke-width="3"/>
+    <text x="700" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="#3a5c2a">⚡</text>
+    <circle cx="750" cy="29" r="20" fill="#a8c8e8" stroke="#5c3a21" stroke-width="3"/>
+    <text x="750" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="#2a4a6a">☺</text>
+    <circle cx="800" cy="29" r="20" fill="#e8c4d8" stroke="#5c3a21" stroke-width="3"/>
+    <text x="800" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="#6a2a4a">⏩</text>
+    <text x="750" y="11" font-family="Arial" font-size="9" text-anchor="middle" fill="#a8957a">boosters (cost, greys out if unaffordable)</text>
+  </g>
+
+  <rect x="1080" y="14" width="180" height="30" rx="15" fill="#f4a9b8" stroke="#5c3a21" stroke-width="3"/>
+  <text x="1170" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="#5c3a21">1:42</text>
+
+  <!-- ============ CUSTOMER QUEUE BAND (58-260px, ~28%) ============ -->
+  <rect x="0" y="58" width="1280" height="202" fill="#fdf8ee"/>
+  <line x1="0" y1="260" x2="1280" y2="260" stroke="#5c3a21" stroke-width="3"/>
+  <text x="20" y="78" font-family="Arial" font-size="13" fill="#a8957a">CUSTOMER QUEUE — ~28% height (202px)</text>
+
+  <g>
+    <rect x="60"  y="86" width="180" height="150" rx="12" fill="none" stroke="#cbb89a" stroke-width="2" stroke-dasharray="6 6"/>
+    <rect x="350" y="86" width="180" height="150" rx="12" fill="none" stroke="#cbb89a" stroke-width="2" stroke-dasharray="6 6"/>
+    <rect x="640" y="86" width="180" height="150" rx="12" fill="none" stroke="#cbb89a" stroke-width="2" stroke-dasharray="6 6"/>
+    <rect x="930" y="86" width="180" height="150" rx="12" fill="none" stroke="#cbb89a" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="80" y="92" width="140" height="32" rx="8" fill="#fff" stroke="#5c3a21" stroke-width="2.5"/>
+    <circle cx="98" cy="108" r="10" fill="#f3e3c4" stroke="#5c3a21" stroke-width="2"/>
+    <circle cx="122" cy="108" r="10" fill="#f3e3c4" stroke="#5c3a21" stroke-width="2"/>
+    <circle cx="146" cy="108" r="10" fill="#e8e0d0" stroke="#cbb89a" stroke-width="2"/>
+    <rect x="85" y="130" width="130" height="9" rx="4.5" fill="#e0dccc"/>
+    <rect x="85" y="130" width="90" height="9" rx="4.5" fill="#7ec468"/>
+    <circle cx="150" cy="184" r="24" fill="#e8c39a" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="130" y="204" width="40" height="50" rx="9" fill="#f4a9b8" stroke="#5c3a21" stroke-width="3"/>
+    <text x="150" y="250" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">College Student</text>
+  </g>
+
+  <g opacity="0.7">
+    <circle cx="440" cy="184" r="24" fill="#e8c39a" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="420" y="204" width="40" height="50" rx="9" fill="#8a8fc4" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="370" y="92" width="140" height="32" rx="8" fill="#fff" stroke="#5c3a21" stroke-width="2.5"/>
+    <rect x="375" y="130" width="130" height="9" rx="4.5" fill="#e0dccc"/>
+    <rect x="375" y="130" width="40" height="9" rx="4.5" fill="#e8746a"/>
+    <text x="440" y="250" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">Office Worker</text>
+  </g>
+
+  <g opacity="0.3">
+    <circle cx="730" cy="184" r="24" fill="#e8c39a" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="710" y="204" width="40" height="50" rx="9" fill="#cbb89a" stroke="#5c3a21" stroke-width="3"/>
+    <text x="730" y="250" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">(empty slot)</text>
+  </g>
+  <g opacity="0.3">
+    <circle cx="1020" cy="184" r="24" fill="#e8c39a" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="1000" y="204" width="40" height="50" rx="9" fill="#cbb89a" stroke="#5c3a21" stroke-width="3"/>
+    <text x="1020" y="250" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">(empty slot)</text>
+  </g>
+
+  <!-- ============ STATION ROW BAND (260-577px, ~44%) ============ -->
+  <rect x="0" y="260" width="1280" height="317" fill="#f3ead8"/>
+  <text x="20" y="280" font-family="Arial" font-size="13" fill="#8a7558">STATION ROW — ~44% height (317px), 5 zones</text>
+
+  <g>
+    <rect x="20" y="296" width="232" height="262" rx="16" fill="#fff" stroke="#5c3a21" stroke-width="3"/>
+    <ellipse cx="136" cy="380" rx="76" ry="46" fill="#f3e3c4" stroke="#5c3a21" stroke-width="4"/>
+    <rect x="80" y="404" width="112" height="12" rx="6" fill="#e0dccc"/>
+    <rect x="80" y="404" width="65" height="12" rx="6" fill="#7ec468"/>
+    <text x="136" y="528" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#5c3a21">Steamer</text>
+    <text x="136" y="548" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">accepts: raw-momo</text>
+
+    <rect x="268" y="296" width="232" height="262" rx="16" fill="#fff" stroke="#5c3a21" stroke-width="3"/>
+    <ellipse cx="384" cy="380" rx="76" ry="46" fill="#3b3b3b" stroke="#5c3a21" stroke-width="4"/>
+    <rect x="328" y="404" width="112" height="12" rx="6" fill="#e0dccc"/>
+    <text x="384" y="528" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#5c3a21">Fry Pan</text>
+    <text x="384" y="548" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">accepts: raw-momo</text>
+
+    <rect x="516" y="296" width="232" height="262" rx="16" fill="#fff" stroke="#5c3a21" stroke-width="3"/>
+    <ellipse cx="632" cy="380" rx="76" ry="46" fill="#5c5c8a" stroke="#5c3a21" stroke-width="4"/>
+    <rect x="576" y="404" width="112" height="12" rx="6" fill="#e0dccc"/>
+    <text x="632" y="528" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#5c3a21">Noodle Pot</text>
+    <text x="632" y="548" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">accepts: raw-noodles</text>
+
+    <rect x="764" y="296" width="232" height="262" rx="16" fill="#fff" stroke="#5c3a21" stroke-width="3"/>
+    <rect x="804" y="350" width="152" height="68" rx="14" fill="#d9534f" stroke="#5c3a21" stroke-width="4"/>
+    <text x="880" y="528" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#5c3a21">Laphing Tray</text>
+    <text x="880" y="548" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">accepts: raw-laphing-mix</text>
+
+    <rect x="1012" y="296" width="248" height="262" rx="16" fill="#fdf0f4" stroke="#5c3a21" stroke-width="3"/>
+    <ellipse cx="1136" cy="380" rx="86" ry="50" fill="#fff" stroke="#f4a9b8" stroke-width="5"/>
+    <text x="1136" y="386" font-family="Arial" font-size="13" text-anchor="middle" fill="#e891a4">drag cooked item here</text>
+    <text x="1136" y="528" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#5c3a21">Plating Counter</text>
+    <text x="1136" y="548" font-family="Arial" font-size="11" text-anchor="middle" fill="#a8957a">opens popup, add toppings</text>
+  </g>
+
+  <!-- ============ HOTBAR STRIP (577-664px, ~12%) ============ -->
+  <rect x="0" y="577" width="1280" height="87" fill="#e8dcc8" stroke="#5c3a21" stroke-width="3"/>
+  <text x="20" y="595" font-family="Arial" font-size="12" fill="#8a7558">INGREDIENT HOTBAR — fixed, ~12% height (87px), infinite supply, drag into matching stations above</text>
+
+  <g>
+    <rect x="40" y="602" width="76" height="56" rx="12" fill="#fbf3e6" stroke="#5c3a21" stroke-width="3"/>
+    <circle cx="78" cy="630" r="18" fill="#e8c87a" stroke="#5c3a21" stroke-width="3"/>
+    <text x="78" y="636" font-family="Arial" font-size="16" text-anchor="middle">🥟</text>
+    <text x="78" y="672" font-family="Arial" font-size="10" text-anchor="middle" fill="#a8957a">raw momo</text>
+
+    <rect x="130" y="602" width="76" height="56" rx="12" fill="#fbf3e6" stroke="#5c3a21" stroke-width="3"/>
+    <circle cx="168" cy="630" r="18" fill="#e8d9a0" stroke="#5c3a21" stroke-width="3"/>
+    <text x="168" y="636" font-family="Arial" font-size="16" text-anchor="middle">🍝</text>
+    <text x="168" y="672" font-family="Arial" font-size="10" text-anchor="middle" fill="#a8957a">raw noodles</text>
+
+    <rect x="220" y="602" width="76" height="56" rx="12" fill="#fbf3e6" stroke="#5c3a21" stroke-width="3"/>
+    <circle cx="258" cy="630" r="18" fill="#c9e0a8" stroke="#5c3a21" stroke-width="3"/>
+    <text x="258" y="636" font-family="Arial" font-size="16" text-anchor="middle">🥗</text>
+    <text x="258" y="672" font-family="Arial" font-size="10" text-anchor="middle" fill="#a8957a">laphing mix</text>
+  </g>
+
+  <!-- decorative-only props filling unused hotbar space, per earlier "Option A" decision -->
+  <g opacity="0.8">
+    <rect x="1100" y="608" width="26" height="40" rx="6" fill="#f4a9b8" stroke="#5c3a21" stroke-width="2.5"/>
+    <rect x="1135" y="608" width="26" height="40" rx="6" fill="#9fd88a" stroke="#5c3a21" stroke-width="2.5"/>
+    <rect x="1170" y="608" width="26" height="40" rx="6" fill="#e8b14a" stroke="#5c3a21" stroke-width="2.5"/>
+    <text x="1148" y="664" font-family="Arial" font-size="10" text-anchor="middle" fill="#a8957a">decorative condiment jars</text>
+  </g>
+</svg>

@@ -1,0 +1,20 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever UI Icon: Coin -->
+  <!-- Drop shadow -->
+  <ellipse cx="64" cy="110" rx="34" ry="6" fill="#3a2317" opacity="0.15"/>
+
+  <!-- Coin body (thick outline, flat warm gold, kawaii style) -->
+  <circle cx="64" cy="62" r="46" fill="#e8b14a" stroke="#5c3a21" stroke-width="5"/>
+  <!-- inner rim -->
+  <circle cx="64" cy="62" r="35" fill="none" stroke="#c98f2e" stroke-width="4"/>
+  <!-- highlight -->
+  <ellipse cx="48" cy="42" rx="14" ry="8" fill="#fbd98a" opacity="0.8"/>
+
+  <!-- Rs. symbol -->
+  <text x="64" y="76" font-family="Arial, sans-serif" font-size="34" font-weight="bold"
+        fill="#5c3a21" text-anchor="middle">Rs</text>
+
+  <!-- sparkle accents -->
+  <path d="M104 30 l4 8 l8 4 l-8 4 l-4 8 l-4-8 l-8-4 l8-4 z" fill="#fff6e0" opacity="0.9"/>
+  <circle cx="22" cy="86" r="3" fill="#fff6e0" opacity="0.8"/>
+</svg>

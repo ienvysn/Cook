@@ -1,0 +1,135 @@
+.item-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    border-radius: 8px;
+    user-select: none;
+}
+
+.hotbar {
+    text-align: center;
+    color: white;
+}
+.hotbar h3 { margin: 0 0 10px 0; }
+
+.hotbar-slots {
+    display: flex;
+    gap: 15px;
+}
+
+.hotbar-slot {
+    cursor: grab;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.station {
+    background: #ecf0f1;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.station-slots {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.station-slot {
+    width: 80px;
+    height: 80px;
+    background: #bdc3c7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 2px dashed #7f8c8d;
+}
+
+.cook-progress-bar {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    height: 6px;
+    background: #34495e;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.cook-progress {
+    height: 100%;
+    background: #2ecc71;
+    width: 0%;
+}
+
+.ready-item {
+    cursor: grab;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customer {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    width: 120px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 2px dashed transparent;
+}
+
+.customer-avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.customer-order-bubble {
+    font-size: 14px;
+    margin-bottom: 10px;
+    background: #f1f2f6;
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.patience-bar-container {
+    height: 8px;
+    background: #ecf0f1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.patience-bar {
+    height: 100%;
+    background: #2ecc71;
+    width: 100%;
+}
+
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.9);
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    gap: 20px;
+    font-weight: bold;
+    z-index: 10;
+}

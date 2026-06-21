@@ -1,0 +1,10 @@
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever Topping: Sesame -->
+  <circle cx="40" cy="40" r="34" fill="#fbf3e6" stroke="#5c3a21" stroke-width="4"/>
+  <!-- scattered sesame seeds -->
+  <ellipse cx="30" cy="32" rx="5" ry="3" fill="#f3e3c4" stroke="#5c3a21" stroke-width="2" transform="rotate(-20 30 32)"/>
+  <ellipse cx="46" cy="28" rx="5" ry="3" fill="#3a2317" transform="rotate(15 46 28)"/>
+  <ellipse cx="52" cy="44" rx="5" ry="3" fill="#f3e3c4" stroke="#5c3a21" stroke-width="2" transform="rotate(-10 52 44)"/>
+  <ellipse cx="32" cy="50" rx="5" ry="3" fill="#3a2317" transform="rotate(25 32 50)"/>
+  <ellipse cx="44" cy="54" rx="5" ry="3" fill="#f3e3c4" stroke="#5c3a21" stroke-width="2" transform="rotate(5 44 54)"/>
+</svg>

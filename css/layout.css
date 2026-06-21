@@ -1,0 +1,29 @@
+#floor-area {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-between;
+}
+
+#customers-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;
+    padding: 20px;
+    min-height: 200px;
+}
+
+#stations-area {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+#hotbar-area {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background: #2c3e50;
+}

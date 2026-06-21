@@ -1,0 +1,11 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever UI Icon: Toast - Fail -->
+  <ellipse cx="64" cy="116" rx="30" ry="5" fill="#3a2317" opacity="0.12"/>
+
+  <circle cx="64" cy="62" r="46" fill="#e8746a" stroke="#5c3a21" stroke-width="5"/>
+  <circle cx="64" cy="62" r="35" fill="none" stroke="#cf5a51" stroke-width="4"/>
+
+  <!-- X mark -->
+  <path d="M46 44 L82 80 M82 44 L46 80" fill="none" stroke="#5c2620" stroke-width="9"
+        stroke-linecap="round"/>
+</svg>

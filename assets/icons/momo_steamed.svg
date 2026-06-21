@@ -1,0 +1,40 @@
+<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever Food: Steamed Momo (plated, no toppings) -->
+  <ellipse cx="80" cy="138" rx="50" ry="8" fill="#3a2317" opacity="0.1"/>
+
+  <!-- plate -->
+  <ellipse cx="80" cy="124" rx="58" ry="16" fill="#fbf3e6" stroke="#5c3a21" stroke-width="4"/>
+  <ellipse cx="80" cy="120" rx="58" ry="16" fill="#ffffff" stroke="#5c3a21" stroke-width="4"/>
+
+  <!-- three dumplings, pleated kawaii style -->
+  <g>
+    <ellipse cx="56" cy="98" rx="22" ry="19" fill="#f3e3c4" stroke="#5c3a21" stroke-width="4"/>
+    <path d="M40 90 Q44 80 56 80 Q68 80 72 90" fill="none" stroke="#5c3a21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M44 88 L48 96 M52 86 L54 96 M60 86 L60 96 M68 88 L66 96"
+          stroke="#cba869" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g>
+    <ellipse cx="104" cy="96" rx="22" ry="19" fill="#f6e8cb" stroke="#5c3a21" stroke-width="4"/>
+    <path d="M88 88 Q92 78 104 78 Q116 78 120 88" fill="none" stroke="#5c3a21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M92 86 L96 94 M100 84 L102 94 M108 84 L108 94 M116 86 L114 94"
+          stroke="#cba869" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g>
+    <ellipse cx="80" cy="112" rx="24" ry="20" fill="#f9eed8" stroke="#5c3a21" stroke-width="4"/>
+    <path d="M62 103 Q66 92 80 92 Q94 92 98 103" fill="none" stroke="#5c3a21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M66 101 L70 110 M74 99 L76 110 M84 99 L84 110 M94 101 L90 110"
+          stroke="#cba869" stroke-width="2" stroke-linecap="round"/>
+    <!-- kawaii face on the front dumpling -->
+    <circle cx="73" cy="110" r="2.6" fill="#3a2317"/>
+    <circle cx="87" cy="110" r="2.6" fill="#3a2317"/>
+    <path d="M76 116 Q80 119 84 116" fill="none" stroke="#3a2317" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="70" cy="114" rx="4" ry="2.5" fill="#f4a9b8" opacity="0.6"/>
+    <ellipse cx="90" cy="114" rx="4" ry="2.5" fill="#f4a9b8" opacity="0.6"/>
+  </g>
+
+  <!-- steam wisps -->
+  <path d="M80 70 Q76 58 82 48 Q86 40 80 30" fill="none" stroke="#cbb89a" stroke-width="4"
+        stroke-linecap="round" opacity="0.7"/>
+  <path d="M58 76 Q54 66 60 56" fill="none" stroke="#cbb89a" stroke-width="3"
+        stroke-linecap="round" opacity="0.5"/>
+</svg>

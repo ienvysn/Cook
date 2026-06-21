@@ -1,0 +1,20 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Momo Fever UI Icon: Star (filled) -->
+  <ellipse cx="64" cy="112" rx="28" ry="5" fill="#3a2317" opacity="0.12"/>
+
+  <path d="M64 14
+           L78 50
+           L116 53
+           L87 78
+           L96 115
+           L64 95
+           L32 115
+           L41 78
+           L12 53
+           L50 50
+           Z"
+        fill="#f6c945" stroke="#5c3a21" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- inner highlight -->
+  <ellipse cx="52" cy="48" rx="10" ry="6" fill="#fde9a8" opacity="0.9"/>
+</svg>
