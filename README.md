@@ -1,4 +1,4 @@
-# Momo Fever
+# Cook
 
 To play the game, you need to serve the directory locally because it uses ES6 modules.
 You can use a simple python server:
