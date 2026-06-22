@@ -10,6 +10,8 @@ to cut scope from the *next* sprint, not to skip ahead with a half-working found
 Rule of thumb: every sprint must end with something you can physically click/drag in
 a browser. "I wrote the class but didn't wire it up yet" does not count as done.
 
+add the current sprint plans chnages or bug ,/ fixes in log.md
+
 ---
 
 ## Sprint 0 — Project Skeleton (no game logic)

@@ -3,6 +3,7 @@ import { Station } from '../entities/Station.js';
 import { Customer } from '../entities/Customer.js';
 import { CUSTOMER_TYPES } from '../data/customerTypes.js';
 import { MatchSystem } from '../systems/MatchSystem.js';
+import { Toast } from '../ui/Toast.js';
 
 export class FloorScene {
     constructor(gameClock, dragManager, levelConfig) {
@@ -13,6 +14,7 @@ export class FloorScene {
         this.hotbar = new Hotbar();
         this.stations = [];
         this.customers = [];
+        this.telegraphedCustomers = [];
         
         this.score = 0;
         this.money = 0;
@@ -65,6 +67,19 @@ export class FloorScene {
             this.nextSpawnTime = this.timeElapsedMs + (this.levelConfig.spawnIntervalSeconds * 1000);
         }
 
+        // Update telegraphed customers
+        for (let i = this.telegraphedCustomers.length - 1; i >= 0; i--) {
+            const tel = this.telegraphedCustomers[i];
+            tel.remainingMs -= delta;
+            if (tel.remainingMs <= 0) {
+                if (tel.element && tel.element.parentNode) {
+                    tel.element.parentNode.removeChild(tel.element);
+                }
+                this.telegraphedCustomers.splice(i, 1);
+                this.addCustomerToQueue(tel.customer);
+            }
+        }
+
         // Update customers
         for (let i = this.customers.length - 1; i >= 0; i--) {
             const customer = this.customers[i];
@@ -76,14 +91,32 @@ export class FloorScene {
     }
 
     spawnCustomer() {
-        if (this.customers.length >= 4) return; // limit queue size
+        if (this.customers.length + this.telegraphedCustomers.length >= 4) return; // limit queue size
 
         const typeId = this.levelConfig.customerTypes[Math.floor(Math.random() * this.levelConfig.customerTypes.length)];
         const config = CUSTOMER_TYPES[typeId];
         
         const customer = new Customer(`customer-${Date.now()}`, config);
+
+        if (config.telegraphMs) {
+            const telegraphEl = document.createElement('div');
+            telegraphEl.className = 'customer-telegraph';
+            telegraphEl.style = 'padding: 10px; background: #e74c3c; color: white; margin: 5px; border-radius: 4px; text-align: center; font-weight: bold; font-size: 14px;';
+            telegraphEl.innerHTML = `⚠️ Incoming: ${config.name}`;
+            this.container.querySelector('#customers-area').appendChild(telegraphEl);
+
+            this.telegraphedCustomers.push({
+                customer: customer,
+                remainingMs: config.telegraphMs,
+                element: telegraphEl
+            });
+        } else {
+            this.addCustomerToQueue(customer);
+        }
+    }
+
+    addCustomerToQueue(customer) {
         this.customers.push(customer);
-        
         const el = customer.render(this.dragManager, (cust, itemType, draggableEl) => this.handleServe(cust, itemType, draggableEl));
         this.container.querySelector('#customers-area').appendChild(el);
     }
@@ -103,16 +136,27 @@ export class FloorScene {
         // Evaluate match
         const result = MatchSystem.evaluate(servedItemType, customer.order);
 
+        // Calculate toast position
+        let toastX = 0, toastY = 0;
+        if (customer.element) {
+            toastX = customer.element.offsetLeft + (customer.element.offsetWidth / 2);
+            toastY = customer.element.offsetTop;
+        }
+
         if (result.success) {
             this.score += 100;
             this.money += result.payment;
             this.servedCount += 1;
             this.updateHUD();
             
+            Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, result.payment, 'Perfect!', 'perfect');
+            
             // Check win condition
             if (this.servedCount >= this.levelConfig.goal.target) {
                 setTimeout(() => alert(`Level Complete! Score: ${this.score}`), 100);
             }
+        } else {
+            Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, 0, 'Wrong Order', 'fail');
         }
 
         // Customer leaves immediately after ANY serve attempt

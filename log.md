@@ -1,9 +1,14 @@
 # Momo Fever - Development Log
 
 ## Current Sprint
+**Sprint 3: Multiple Stations & Customer Types**
+- Goal: Exercise the "many simultaneous timers" problem for real, and prove the data-driven level config actually lets you add content without new code.
+- Status: Completed. Added new stations (Fry Pan, Laphing Tray), a new telegraphed customer (Office Worker), and LEVEL_2 / LEVEL_3 configs.
+
+## Past Sprints
 **Sprint 2: Floor Scene & Cooking Loop**
 - Goal: Get the core game loop running (drag raw ingredient -> cook -> drag cooked item to customer -> get paid).
-- Status: In Progress. We've laid down the core architecture and are currently ironing out the interaction layer (drag-and-drop).
+- Status: Completed.
 
 ## Features Implemented
 - **Hotbar Drag Sources**: The hotbar acts as an infinite source of raw ingredients (`raw-momo`).
@@ -11,6 +16,11 @@
 - **Customer Spawning & Patience**: Customers spawn based on level configs, display what they want, and their patience depletes over time.
 - **Match System**: Simplistic (v1) evaluation comparing served item against the customer order.
 - **Quality of Life Dropzones**: Entire stations act as dropzones rather than individual small slots; dropping an item on a station automatically finds an empty slot for it.
+- **Additional Stations**: Added 'Fry Pan' (noodles) and 'Laphing Tray' (laphing) station types to item registry.
+- **Additional Customer Type**: Added 'Office Worker' with a fast patience drain rate and a telegraphed arrival (3-second warning cue).
+- **Telegraph System**: Updated `FloorScene` to queue customers if they have a `telegraphMs` configuration.
+- **Level 2 and 3 Configs**: Defined `LEVEL_2` and `LEVEL_3` in `data/levels.js`.
+- **Feedback Toast**: Implemented the Sprint 4D Feedback Toast UI system for visual feedback on serves.
 
 ## Bugs Fixed
 - **Drag Intersection Failure**: `interact.js` wasn't triggering dropzones because we were moving a clone instead of the actual dragged element. Fixed by moving the real element instead and leaving a placeholder behind.
