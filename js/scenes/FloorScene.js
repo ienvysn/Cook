@@ -25,6 +25,11 @@ export class FloorScene {
         
         this.container = null;
         this.clockSub = null;
+        this.platingScene = null;
+    }
+
+    setPlatingScene(platingScene) {
+        this.platingScene = platingScene;
     }
 
     render(container) {
@@ -51,6 +56,40 @@ export class FloorScene {
             const station = new Station(stConfig, this.gameClock);
             this.stations.push(station);
             this.container.querySelector('#stations-area').appendChild(station.render(this.dragManager));
+        });
+
+        // Render Plating Counter
+        const platingCounterEl = document.createElement('div');
+        platingCounterEl.className = 'station plating-counter';
+        platingCounterEl.id = 'plating-counter-dropzone';
+        platingCounterEl.innerHTML = `
+            <div style="font-size: 16px; color: #5c3a21; font-weight: bold; margin-bottom: 5px;">Plating Counter</div>
+            <div id="plating-counter-items" style="width: 220px; height: 90px; border: 4px dashed #f4a9b8; border-radius: 20px; display: flex; align-items: center; justify-content: flex-start; background: white; padding: 10px; gap: 10px; overflow: hidden;">
+                <div id="plating-counter-empty-text" style="font-size: 10px; color: #a8957a; text-align: center; width: 100%;">Drop cooked<br>items here</div>
+            </div>
+        `;
+        this.container.querySelector('#stations-area').appendChild(platingCounterEl);
+
+        this.dragManager.registerZone('plating-counter-dropzone', platingCounterEl, {
+            scene: 'floor',
+            accepts: [], // Empty accepts means it could accept anything, but we'll filter below
+            onReceive: (itemType, draggableEl) => {
+                if (itemType.startsWith('raw-')) {
+                    // Reject raw ingredients
+                    if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
+                    return;
+                }
+                const itemsContainer = document.getElementById('plating-counter-items');
+                if (itemsContainer && itemsContainer.querySelectorAll('.plated-item').length >= 3) {
+                    if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
+                    return; // Full!
+                }
+                const sourceStationId = draggableEl.getAttribute('data-source-station');
+                const sourceSlotIndex = draggableEl.getAttribute('data-source-slot');
+                if (this.platingScene) {
+                    this.platingScene.open(itemType, sourceStationId, sourceSlotIndex, draggableEl);
+                }
+            }
         });
 
         // Set initial spawn time
@@ -122,11 +161,21 @@ export class FloorScene {
     }
 
     handleServe(customer, servedItemType, draggableEl) {
-        // Clear it from the station slot!
+        // Clear it from the station slot or plating counter!
         const sourceStationId = draggableEl.getAttribute('data-source-station');
         const sourceSlotIndex = draggableEl.getAttribute('data-source-slot');
         
-        if (sourceStationId && sourceSlotIndex !== null) {
+        if (sourceStationId === 'plating-counter') {
+            if (draggableEl && draggableEl.parentNode) {
+                draggableEl.parentNode.removeChild(draggableEl);
+            }
+            const itemsContainer = document.getElementById('plating-counter-items');
+            if (itemsContainer && itemsContainer.querySelectorAll('.plated-item').length === 0) {
+                if (!document.getElementById('plating-counter-empty-text')) {
+                    itemsContainer.innerHTML = '<div id="plating-counter-empty-text" style="font-size: 10px; color: #a8957a; text-align: center; width: 100%;">Drop cooked<br>items here</div>';
+                }
+            }
+        } else if (sourceStationId && sourceSlotIndex !== null) {
             const station = this.stations.find(s => s.id === sourceStationId);
             if (station) {
                 station.clearSlot(parseInt(sourceSlotIndex));
@@ -134,7 +183,8 @@ export class FloorScene {
         }
 
         // Evaluate match
-        const result = MatchSystem.evaluate(servedItemType, customer.order);
+        const servedToppings = JSON.parse(draggableEl.getAttribute('data-toppings') || '[]');
+        const result = MatchSystem.evaluate(servedItemType, servedToppings, customer.order);
 
         // Calculate toast position
         let toastX = 0, toastY = 0;
@@ -149,14 +199,26 @@ export class FloorScene {
             this.servedCount += 1;
             this.updateHUD();
             
-            Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, result.payment, 'Perfect!', 'perfect');
+            if (result.toppingAccuracy === 1.0) {
+                Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, result.payment, 'Perfect!', 'perfect');
+            } else {
+                const details = [];
+                if (result.missingToppings && result.missingToppings.length > 0) {
+                    details.push(`Missing: ${result.missingToppings.join(', ')}`);
+                }
+                if (result.extraToppings && result.extraToppings.length > 0) {
+                    details.push(`Extra: ${result.extraToppings.join(', ')}`);
+                }
+                const detailStr = details.join(' | ');
+                Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, result.payment, detailStr, 'partial');
+            }
             
             // Check win condition
             if (this.servedCount >= this.levelConfig.goal.target) {
                 setTimeout(() => alert(`Level Complete! Score: ${this.score}`), 100);
             }
         } else {
-            Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, 0, 'Wrong Order', 'fail');
+            Toast.spawn(this.container.querySelector('#customers-area'), toastX, toastY, 0, 'Wrong Dish', 'fail');
         }
 
         // Customer leaves immediately after ANY serve attempt

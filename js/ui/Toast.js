@@ -23,7 +23,7 @@ export class Toast {
         toast.style.pointerEvents = 'none';
         toast.style.whiteSpace = 'nowrap';
         toast.style.zIndex = '1000';
-        toast.style.transition = 'all 1s ease-out';
+        toast.style.transition = 'all 2.5s ease-out';
         toast.style.opacity = '1';
         
         if (variant === 'perfect') {
@@ -45,13 +45,13 @@ export class Toast {
         // Trigger reflow
         toast.offsetHeight;
         
-        toast.style.top = `${y - 50}px`;
+        toast.style.top = `${y - 80}px`;
         toast.style.opacity = '0';
         
         setTimeout(() => {
             if (toast.parentNode) {
                 toast.parentNode.removeChild(toast);
             }
-        }, 1000);
+        }, 2500);
     }
 }

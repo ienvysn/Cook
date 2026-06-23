@@ -14,9 +14,17 @@ export const ITEM_REGISTRY = {
     'laphing': {
         placeholder: { emoji: '🫔', color: '#f1c40f' },
         sprite: null,
-        validToppings: ['chilli'],
+        validToppings: ['chilli-oil', 'extra-sour'],
         cookTimeMs: 3000 // 3 seconds for laphing tray
     }
+};
+
+export const TOPPING_REGISTRY = {
+    'chutney': { placeholder: { emoji: '🌶️', color: '#a83232' }, sprite: null },
+    'sesame':  { placeholder: { emoji: '⚪', color: '#cfc9a3' }, sprite: null },
+    'chilli':  { placeholder: { emoji: '🔥', color: '#ff4d4d' }, sprite: null },
+    'chilli-oil': { placeholder: { emoji: '🍯', color: '#c0392b' }, sprite: null },
+    'extra-sour': { placeholder: { emoji: '🍋', color: '#f1c40f' }, sprite: null }
 };
 
 export const HOTBAR_SLOTS = [

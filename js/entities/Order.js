@@ -1,7 +1,7 @@
 export class Order {
-    constructor(baseType, quantity = 1) {
+    constructor(baseType, quantity = 1, requestedToppings = []) {
         this.baseType = baseType;
-        this.requestedToppings = []; // Unused in sprint 2
+        this.requestedToppings = requestedToppings;
         this.quantity = quantity;
     }
 }
