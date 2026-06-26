@@ -83,6 +83,14 @@ export class Station {
                 if (slot.progress >= slot.maxTime) {
                     slot.state = 'ready';
                     slot.progress = slot.maxTime;
+                    slot.burnProgress = 0;
+                    slot.burnTime = slot.maxTime * 1.5; // Custom burn time (1.5x cook time)
+                    slot.uiNeedsUpdate = true;
+                }
+            } else if (slot && slot.state === 'ready') {
+                slot.burnProgress += delta;
+                if (slot.burnProgress >= slot.burnTime) {
+                    slot.state = 'burnt';
                     slot.uiNeedsUpdate = true;
                 }
             }
@@ -134,6 +142,24 @@ export class Station {
             // Actually, we'll store slot reference on the element!
             readyItemEl.setAttribute('data-source-station', this.id);
             readyItemEl.setAttribute('data-source-slot', index);
+        } else if (slot.state === 'burnt') {
+            slotEl.innerHTML = `
+                <div class="burnt-item" id="${this.id}-burnt-${index}">
+                    <div class="item-icon placeholder" style="background:#333; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        🔥
+                    </div>
+                </div>
+            `;
+            
+            const burntItemEl = slotEl.querySelector('.burnt-item');
+            
+            this.dragManager.registerDraggable(burntItemEl, {
+                itemType: 'burnt-' + baseType,
+                scene: 'floor'
+            });
+
+            burntItemEl.setAttribute('data-source-station', this.id);
+            burntItemEl.setAttribute('data-source-slot', index);
         }
     }
 

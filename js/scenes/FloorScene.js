@@ -74,8 +74,8 @@ export class FloorScene {
             scene: 'floor',
             accepts: [], // Empty accepts means it could accept anything, but we'll filter below
             onReceive: (itemType, draggableEl) => {
-                if (itemType.startsWith('raw-')) {
-                    // Reject raw ingredients
+                if (itemType.startsWith('raw-') || itemType.startsWith('burnt-')) {
+                    // Reject raw ingredients and burnt items
                     if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
                     return;
                 }
@@ -88,6 +88,39 @@ export class FloorScene {
                 const sourceSlotIndex = draggableEl.getAttribute('data-source-slot');
                 if (this.platingScene) {
                     this.platingScene.open(itemType, sourceStationId, sourceSlotIndex, draggableEl);
+                }
+            }
+        });
+
+        // Render Dustbin
+        const dustbinEl = document.createElement('div');
+        dustbinEl.className = 'station dustbin';
+        dustbinEl.id = 'dustbin-dropzone';
+        dustbinEl.innerHTML = `
+            <div style="font-size: 16px; color: #5c3a21; font-weight: bold; margin-bottom: 5px;">Dustbin</div>
+            <div id="dustbin-items" style="width: 100px; height: 90px; border: 4px dashed #7f8c8d; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: #95a5a6; padding: 10px; font-size: 30px; margin-left: 20px;">
+                🗑️
+            </div>
+        `;
+        this.container.querySelector('#stations-area').appendChild(dustbinEl);
+
+        this.dragManager.registerZone('dustbin-dropzone', dustbinEl, {
+            scene: 'floor',
+            accepts: [], 
+            onReceive: (itemType, draggableEl) => {
+                if (!itemType.startsWith('burnt-')) {
+                    if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
+                    return;
+                }
+                
+                const sourceStationId = draggableEl.getAttribute('data-source-station');
+                const sourceSlotIndex = draggableEl.getAttribute('data-source-slot');
+                
+                if (sourceStationId && sourceSlotIndex !== null) {
+                    const station = this.stations.find(s => s.id === sourceStationId);
+                    if (station) {
+                        station.clearSlot(parseInt(sourceSlotIndex));
+                    }
                 }
             }
         });
