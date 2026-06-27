@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script>
         if (typeof interact === 'undefined') {
@@ -17,18 +17,25 @@
     </script>
 </head>
 <body>
+    <!-- Main game area — FloorScene renders into this -->
     <div id="game-container"></div>
-    <div id="plating-popup" style="display: none;">
+
+    <!-- Plating popup — always in DOM, shown/hidden by PlatingScene -->
+    <div id="plating-popup" style="display:none;">
         <div class="plating-popup-content">
             <h2>Plating</h2>
             <div id="plating-plate-area"></div>
             <div id="plating-topping-bin"></div>
             <div class="plating-actions">
                 <button id="plating-cancel">Cancel</button>
-                <button id="plating-confirm">Plate</button>
+                <button id="plating-confirm">Plate It!</button>
             </div>
         </div>
     </div>
+
+    <!-- Tally screen — shown by TallyScreen.show(), content injected dynamically -->
+    <div id="tally-screen" style="display:none;"></div>
+
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,51 @@
+/* Combo milestones — pulse on streak increase */
+@keyframes comboPulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+/* Ultra combo glow oscillation */
+@keyframes comboGlow {
+    from { text-shadow: 0 0 4px #e74c3c; }
+    to   { text-shadow: 0 0 14px #e74c3c, 0 0 28px #ff6b6b; }
+}
+
+/* Low mood pulse on the bar */
+@keyframes moodPulse {
+    from { opacity: 1; }
+    to   { opacity: 0.5; }
+}
+
+/* Toast float-up */
+@keyframes toastFloat {
+    0%   { transform: translate(-50%, -100%); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translate(-50%, -220%); opacity: 0; }
+}
+
+/* Booster active shimmer */
+@keyframes boosterShimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.booster-btn.booster-active {
+    background: linear-gradient(90deg, #d5f5e3, #a9dfbf, #d5f5e3);
+    background-size: 200% auto;
+    animation: boosterShimmer 1.5s linear infinite;
+}
+
+/* Customer arrive wiggle */
+@keyframes customerArrive {
+    0%   { transform: translateY(-20px); opacity: 0; }
+    60%  { transform: translateY(4px); }
+    100% { transform: translateY(0); opacity: 1; }
+}
+.customer { animation: customerArrive 0.35s ease-out; }
+
+/* Ready item glow */
+@keyframes readyPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.6); }
+    50%       { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
+}
+.ready-item { animation: readyPulse 1.4s ease-in-out infinite; }

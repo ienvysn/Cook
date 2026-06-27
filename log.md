@@ -1,41 +1,68 @@
 # Momo Fever - Development Log
 
 ## Current Sprint
-**Sprint 4: Plating Sub-Game & Toppings**
-- Goal: Add a secondary gameplay layer (plating) to increase complexity, implement dynamic customer requests, and scale payouts based on accuracy.
-- Status: Completed. Implemented the Plating Scene with time-scaling, interactive topping bins, dynamically generated customer topping requests, and graduated matching logic with detailed toast feedback.
+**Sprint 6: Tally Screen, Upgrades, Star Ratings, Polish Pass**
+- Status: Completed.
+- Added `TallyScreen.js` — post-level overlay showing revenue, tips, booster expenses, net total, and a 1–3 star rating driven by level thresholds from `data/levels.js`.
+- Added a "Faster Steamer" upgrade stub: purchasable from the tally screen with earned money, persisted in session, reduces all cook times by 20% in subsequent levels.
+- Full level progression loop: Level 1 → tally → upgrade → Level 2 → tally → Level 3 → tally → "Game Complete" screen with replay.
+- Added `css/animations.css` with keyframes for combo pulse/glow, mood pulse, customer arrive, ready-item glow, booster shimmer.
+- All tunable constants moved to `js/data/config.js`.
+
+---
 
 ## Past Sprints
+
+**Sprint 5: Gamification Layer (Combo + Mood + Tips + Boosters)**
+- Status: Completed.
+- Implemented `EventBus.js` — simple pub/sub; decouples MatchSystem results from all downstream systems.
+- Implemented `ComboSystem.js` — tracks consecutive perfect serves; multiplier milestones at 5× (1.5x), 10× (2.0x), 15× (3.0x); resets on any fail or partial.
+- Implemented `MoodSystem.js` — global mood meter (0–100); +8 on perfect, +2 on partial, −10 on fail, −5 on abandon; drives patience drain rate (0.8x calm → 1.6x frantic); mood:zero event triggers early level end.
+- Implemented `BoosterSystem.js` — Speed Boost (Rs.150, 15s, cook −30%), Calm Crowd (Rs.150, 15s, patience drain −40%), Quick Plate (Rs.100, single-use, skips plating time-slow). Buttons grey out when unaffordable; countdown timer displayed on active timed boosters.
+- Implemented tip variability: perfect + patience>70% = Rs.50 tip; perfect + patience 30–70% = Rs.25; perfect + patience<30% = Rs.10; partial = Rs.5.
+- Updated `FloorScene.js` to emit EventBus events, apply combo multiplier to score, apply mood+calm-crowd drain modifier to patient timers, wire booster buttons to HUD.
+- Updated `PlatingScene.js` to consume the Quick Plate flag and skip time-slow for that one popup.
+- Updated `Station.js` to read booster cook speed factor each tick (progress × speedFactor).
+- Added combo streak/multiplier display and mood-bar to HUD.
+
+**Sprint 4: Plating Sub-Game & Toppings**
+- Status: Completed. Implemented the Plating Scene with time-scaling, interactive topping bins, dynamically generated customer topping requests, and graduated matching logic with detailed toast feedback.
+
 **Sprint 3: Multiple Stations & Customer Types**
-- Goal: Exercise the "many simultaneous timers" problem for real, and prove the data-driven level config actually lets you add content without new code.
 - Status: Completed.
 
 **Sprint 2: Floor Scene & Cooking Loop**
-- Goal: Get the core game loop running (drag raw ingredient -> cook -> drag cooked item to customer -> get paid).
 - Status: Completed.
 
+---
+
 ## Features Implemented
-- **Hotbar Drag Sources**: The hotbar acts as an infinite source of raw ingredients (`raw-momo`).
-- **Station Cooking Logic**: The Steamer accepts raw momos, starts a timer, and visually progresses until the momo is "ready", turning it into a new draggable element.
-- **Customer Spawning & Patience**: Customers spawn based on level configs, display what they want (including specific toppings), and their patience depletes over time.
-- **Match System**: Upgraded (v2) to support Graduated Matching. It evaluates both the correct base dish and the accuracy of applied toppings (calculating intersections) to scale payment.
-- **Quality of Life Dropzones**: Entire stations act as dropzones rather than individual small slots; dropping an item on a station automatically finds an empty slot for it.
-- **Additional Stations**: Added 'Fry Pan' (noodles) and 'Laphing Tray' (laphing) station types to item registry.
-- **Additional Customer Type**: Added 'Office Worker' with a fast patience drain rate and a telegraphed arrival (3-second warning cue).
-- **Telegraph System**: Updated `FloorScene` to queue customers if they have a `telegraphMs` configuration.
-- **Plating Scene**: A time-scaled popup that allows players to drag and drop toppings onto cooked items.
-- **Plating Counter**: A 3-slot holding area on the floor scene for finalized, plated dishes before they are served.
-- **Feedback Toast**: Implemented the Sprint 4D Feedback Toast UI system for visual feedback on serves, providing detailed info on missing/extra toppings.
+- **GameClock** — single rAF-based tick loop with timeScale; every timer subscribes to it.
+- **DragManager** — wraps interact.js; scene-scoped zones; visual proxy (no state mutation during drag); silent snap-back on invalid drops.
+- **EventBus** — pub/sub decoupling MatchSystem results from ComboSystem, MoodSystem, Toast, and HUD.
+- **Hotbar** — infinite ingredient strip; dragging never depletes.
+- **Stations** — Steamer, Laphing Tray, Fry Pan; cook timers subscribe to GameClock; speed booster applied per-tick; upgrade reduces maxTime on receive.
+- **Customer spawning** — patience drain scales with MoodSystem + Calm Crowd booster; office-worker telegraphed arrival.
+- **MatchSystem v2** — graduated payment: set-based topping comparison, partial payment floor, tipEligible flag.
+- **PlatingScene** — time-scaled popup; Quick Plate booster skips slow; cancel is zero-mutation.
+- **ComboSystem** — streak/multiplier in HUD with CSS glow at milestones.
+- **MoodSystem** — mood bar in HUD; mood:zero ends level early.
+- **BoosterSystem** — 3 mid-level purchasable boosters; spend tracked separately for tally screen.
+- **TallyScreen** — revenue / tips / expenses / net / stars / upgrade shop / continue or replay.
+- **Level progression** — LEVEL_1 → 2 → 3 → game complete; session money and upgrades persist.
+- **Config.js** — all tuning constants in one file.
 
-## Bugs Fixed
-- **Drag Intersection Failure**: `interact.js` wasn't triggering dropzones because we were moving a clone instead of the actual dragged element. Fixed by moving the real element instead and leaving a placeholder behind.
-- **Pointer Event Blocking**: Dragged items were accidentally absorbing the pointer events during movement, meaning `interact.js` couldn't see the dropzones underneath them. Fixed by setting `pointer-events: none` on the dragging element.
-- **Customer Accepting Raw Items**: The customer dropzone was configured to catch anything, allowing players to serve raw momos directly. Fixed by adding a filter in the `Customer.js` drop logic to explicitly reject any item starting with `raw-`.
-- **Placeholder "Sticking" (Clone Bug)**: When a drag was rejected and the item snapped back, its clone placeholder would sometimes get stuck on screen forever. This was due to a race condition where the placeholder reference was erased before the 300ms snap-back animation finished. Fixed by properly scoping the variable.
-- **Layout Jitter on Drag Start**: Clicking an item in the hotbar would cause adjacent items to instantly shift sideways because the placeholder was expanding the flexbox container. Fixed by attaching the placeholder directly to `document.body` with absolute coordinates so it sits behind the item without taking up physical layout space.
-- **Plating Counter Missing DOM Fallback**: Updated the DOM injection dynamically to prevent items from disappearing if the browser cache held onto an older FloorScene layout.
-- **Order Toppings Ignored**: The Order.js class previously ignored randomly generated requested toppings. Added it to the constructor to ensure customers display and expect their desired toppings.
+## Bugs Fixed (historical)
+- Drag intersection failure (moved real element, left placeholder).
+- Pointer event blocking during drag (set pointer-events: none on dragging item).
+- Customer accepting raw items (filter in Customer.js dropzone).
+- Placeholder sticking on rejected drag (scoped variable, cleared before timeout).
+- Layout jitter on drag start (placeholder attached to body with absolute coords).
+- Plating counter missing DOM fallback.
+- Order toppings ignored in constructor.
 
-## Persistent / Known Issues
-- Needs complete testing of the full "serve" loop to ensure score and money update perfectly across edge cases.
-- Combo mechanics, tips, and mood systems are currently excluded (scheduled for Sprint 5).
+## Known Issues / Future Work
+- Touch/mobile layout untested.
+- No persistent save (session only by design per TECH_SPEC).
+- Sound stubs not implemented (out of scope for Sprint 6 unless time allows).
+- Friend Group / TikTok Reviewer customer types are deferred bonus content.
