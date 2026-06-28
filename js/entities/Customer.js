@@ -3,7 +3,7 @@ import { ITEM_REGISTRY, TOPPING_REGISTRY, renderIcon } from '../data/items.js';
 
 export class Customer {
     // Display width of one sprite frame in the customer card
-    static FRAME_W = 140;
+    static FRAME_W = 180;
 
     constructor(id, typeConfig) {
         this.id = id;
@@ -41,13 +41,13 @@ export class Customer {
         let orderIconHtml;
         if (item.verticalSprite && item.sprite) {
             // 1×2 stacked sprite (e.g. laphingbowl): crop to top frame only
-            orderIconHtml = `<div style="width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;
-                                         background:url('${item.sprite}') 0% 0% / 100% 200% no-repeat;"></div>`;
+            orderIconHtml = `<div style="width:72px;height:56px;border-radius:10px;overflow:hidden;flex-shrink:0;
+                                         background:url('${item.sprite}') 50% 0% / contain no-repeat;background-size:100% 200%;"></div>`;
         } else {
             const src = item.platedIcon || item.sprite;
             orderIconHtml = src
                 ? `<img src="${src}" draggable="false"
-                        style="width:38px;height:38px;object-fit:contain;flex-shrink:0;" />`
+                        style="width:64px;height:64px;object-fit:contain;flex-shrink:0;" />`
                 : renderIcon(item);
         }
 
@@ -58,8 +58,8 @@ export class Customer {
             if (!topping) return;
             const emoji = topping.placeholder?.emoji || '❓';
             toppingPills += `
-                <span style="font-size:9px;font-weight:900;color:#c0392b;line-height:1;">+</span>
-                <span style="font-size:16px;line-height:1;">${emoji}</span>
+                <span style="font-size:12px;font-weight:900;color:#c0392b;line-height:1;">+</span>
+                <span style="font-size:22px;line-height:1;">${emoji}</span>
             `;
         });
 

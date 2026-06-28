@@ -28,9 +28,10 @@ const HINTS = [
 ];
 
 export class LaphingScene {
-    constructor(gameClock, dragManager) {
+    constructor(gameClock, dragManager, audioManager) {
         this.gameClock   = gameClock;
         this.dragManager = dragManager;
+        this.audioManager = audioManager || null;
 
         this.popupEl    = document.getElementById('laphing-popup');
         this.plateArea  = document.getElementById('laphing-plate-area');
@@ -69,6 +70,7 @@ export class LaphingScene {
                 this.plateArea.classList.add('laphing-chop-flash');
                 setTimeout(() => this.plateArea.classList.remove('laphing-chop-flash'), 150);
                 this._updateHint();
+
                 if (this.chopCount >= CHOPS_NEEDED) this._advanceTo(5);
             }
         });
@@ -94,15 +96,16 @@ export class LaphingScene {
     _onIngredientDrop(itemType) {
         if (this._blocking) return;
 
-        if (itemType === 'laphing-sauce'   && this.step === 0) this._advanceTo(1);
-        if (itemType === 'laphing-gluten'  && this.step === 1) this._advanceTo(2);
-        if (itemType === 'laphing-noodles' && this.step === 2) this._advanceTo(3);
+        if (itemType === 'laphing-sauce'   && this.step === 0) { this._advanceTo(1); if (this.audioManager) this.audioManager.playPlating(); }
+        if (itemType === 'laphing-gluten'  && this.step === 1) { this._advanceTo(2); if (this.audioManager) this.audioManager.playPlating(); }
+        if (itemType === 'laphing-noodles' && this.step === 2) { this._advanceTo(3); if (this.audioManager) this.audioManager.playPlating(); }
 
         // Soya sauce for the bowl — available at steps 5 and 6, optional
         if (itemType === 'laphing-soya' && (this.step === 5 || this.step === 6) && !this.hasSauce) {
             this.hasSauce = true;
             this._updatePlate();
             this._updateBinState();
+            if (this.audioManager) this.audioManager.playPlating();
         }
     }
 
@@ -116,13 +119,20 @@ export class LaphingScene {
     }
 
     _advanceTo(step) {
+        const prevStep = this.step;
         this.step = step;
         this._updatePlate();
         this._updateHint();
         this._updateBinState();
 
+        // Start chop loop when entering chopping phase
+        if (step === 4 && prevStep !== 4) {
+            if (this.audioManager) this.audioManager.startChop();
+        }
+
         if (step === 5) {
-            // Chopping done → show "Add to Bowl" button
+            // Chopping done → stop chop sound, show "Add to Bowl" button
+            if (this.audioManager) this.audioManager.stopChop();
             this.confirmBtn.disabled    = false;
             this.confirmBtn.textContent = 'Add to Bowl 🥣';
         } else if (step === 6) {
@@ -236,6 +246,9 @@ export class LaphingScene {
     cancel() { this.cleanup(); }
 
     cleanup() {
+        // Stop any looping chop sound if still playing
+        if (this.audioManager) this.audioManager.stopChop();
+
         this._blocking  = false;
         this.step       = 0;
         this.chopCount  = 0;

@@ -9,6 +9,7 @@
   border-radius: 8px;
   user-select: none;
 }
+
 .item-icon.food-img {
   object-fit: cover;
   object-position: center top;
@@ -22,6 +23,7 @@
   align-items: center;
   gap: 10px;
 }
+
 .hotbar-label {
   font-size: 11px;
   font-weight: 700;
@@ -31,11 +33,13 @@
   margin-right: 6px;
   white-space: nowrap;
 }
+
 .hotbar-slots {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .hotbar-slot {
   cursor: grab;
   border-radius: 10px;
@@ -46,6 +50,7 @@
     transform 0.15s,
     box-shadow 0.15s;
 }
+
 .hotbar-slot:hover {
   transform: scale(1.08);
   box-shadow: 0 0 12px rgba(255, 200, 100, 0.5);
@@ -62,6 +67,7 @@
   align-items: center;
   gap: 4px;
 }
+
 .station-name {
   font-size: 11px;
   font-weight: 700;
@@ -114,7 +120,8 @@
   cursor: default;
   background-repeat: no-repeat;
   /* 400% (= 400% auto) preserves the sprite's natural aspect ratio — no vertical squishing */
-  background-size: 400%; /* default to empty frame */
+  background-size: 400%;
+  /* default to empty frame */
 
 }
 
@@ -124,22 +131,27 @@
   background-size: 400%;
   height: 160px;
 }
+
 .station-fry-pan .station-slot {
   background-image: url("../assets/icons/images/finalfryingpan asset.png");
   background-size: 400%;
   height: 160px;
 }
+
 .station-fry-pan .station-slots {
   max-width: 200px;
 }
+
 .station-cooking-pot .station-slot {
   background-image: url("../assets/icons/images/keemanoodle.png");
   background-size: 400%;
   height: 160px;
 }
+
 .station-cooking-pot .station-slots {
   max-width: 155px;
 }
+
 .station-laphing-tray .station-slot {
   background-image: url("../assets/icons/images/laphingprep.png");
   background-size: cover;
@@ -150,28 +162,64 @@
 }
 
 /* ── Sprite frame states — cooking-pot (center-anchored) ── */
-.station-cooking-pot .station-slot.state-empty    { background-position: 0%      70%; }
-.station-cooking-pot .station-slot.state-cooking  { background-position: 30%  70%; }
-.station-cooking-pot .station-slot.state-ready    { background-position: 59%  70%; }
-.station-cooking-pot .station-slot.state-burnt    { background-position: 98%    70%; }
+.station-cooking-pot .station-slot.state-empty {
+  background-position: 0% 70%;
+}
+
+.station-cooking-pot .station-slot.state-cooking {
+  background-position: 30% 70%;
+}
+
+.station-cooking-pot .station-slot.state-ready {
+  background-position: 59% 70%;
+}
+
+.station-cooking-pot .station-slot.state-burnt {
+  background-position: 98% 70%;
+}
 
 /* ── Fry-pan: correct 4-frame X positions, centered vertically ── */
-.station-fry-pan .station-slot.state-empty        { background-position: 30%      10%; }
-.station-fry-pan .station-slot.state-cooking      { background-position: 75%  10%; }
-.station-fry-pan .station-slot.state-ready        { background-position: 28%  85%; }
-.station-fry-pan .station-slot.state-burnt        { background-position: 76%   85%; }
+.station-fry-pan .station-slot.state-empty {
+  background-position: 30% 10%;
+}
+
+.station-fry-pan .station-slot.state-cooking {
+  background-position: 75% 10%;
+}
+
+.station-fry-pan .station-slot.state-ready {
+  background-position: 28% 85%;
+}
+
+.station-fry-pan .station-slot.state-burnt {
+  background-position: 76% 85%;
+}
 
 /* ── Steamer: top-anchored so image locks to the same Y across all states ── */
-.station-steamer .station-slot.state-empty        { background-position: 0%      top; }
-.station-steamer .station-slot.state-cooking      { background-position: 33.33%  top; }
-.station-steamer .station-slot.state-ready        { background-position: 66.67%  top; }
-.station-steamer .station-slot.state-burnt        { background-position: 100%    top; }
+.station-steamer .station-slot.state-empty {
+  background-position: 0% top;
+}
+
+.station-steamer .station-slot.state-cooking {
+  background-position: 33.33% top;
+}
+
+.station-steamer .station-slot.state-ready {
+  background-position: 66.67% top;
+}
+
+.station-steamer .station-slot.state-burnt {
+  background-position: 100% top;
+}
 
 /* ── Laphing: single static image, same position for all states ── */
 .station-laphing-tray .station-slot.state-empty,
 .station-laphing-tray .station-slot.state-cooking,
-.station-laphing-tray .station-slot.state-ready  { background-position: center; }
-.station-laphing-tray .station-slot.state-burnt  {
+.station-laphing-tray .station-slot.state-ready {
+  background-position: center;
+}
+
+.station-laphing-tray .station-slot.state-burnt {
   background-position: center;
   filter: brightness(0.42) sepia(0.7);
 }
@@ -187,6 +235,7 @@
   border-radius: 4px;
   overflow: hidden;
 }
+
 .cook-progress {
   height: 100%;
   background: linear-gradient(90deg, #2ecc71, #27ae60);
@@ -205,6 +254,7 @@
   border-radius: inherit;
   cursor: grab;
 }
+
 .slot-handle:active {
   cursor: grabbing;
 }
@@ -223,8 +273,10 @@
   padding: 0;
   text-align: center;
   width: 140px;
-  margin-bottom: -80px; /* body extends behind counter */
+  margin-bottom: -80px;
+  /* body extends behind counter */
 }
+
 .customer-avatar {
   width: 100px;
   height: 100px;
@@ -235,25 +287,28 @@
   justify-content: center;
   font-size: 26px;
 }
+
 .customer-order-bubble {
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 8px;
-  background: #f1f2f6;
-  padding: 4px;
-  border-radius: 5px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
   font-weight: bold;
 }
 .customer-order-bubble .item-icon {
-  width: 46px;
-  height: 46px;
+  width: 72px;
+  height: 72px;
   margin: 0 auto;
 }
+
 .patience-bar-container {
   height: 7px;
   background: #ecf0f1;
   border-radius: 4px;
   overflow: hidden;
 }
+
 .patience-bar {
   height: 100%;
   background: #2ecc71;
@@ -269,8 +324,7 @@
   border: 2px solid #f4a9b8;
   border-radius: 10px;
   padding: 8px 10px;
-  align-self: flex-end;
-  margin-bottom: 100px;
+  align-self: stretch;
 }
 
 /* ── Dustbin — outside the counter, inside #dustbin-area absolute div ── */
@@ -299,6 +353,7 @@
   flex-wrap: wrap;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
+
 #hud-stats {
   display: flex;
   gap: 14px;
@@ -312,10 +367,12 @@
   align-items: center;
   min-width: 56px;
 }
+
 .combo-streak {
   font-size: 11px;
   color: #7f8c8d;
 }
+
 .combo-mult {
   font-size: 17px;
   font-weight: 900;
@@ -324,14 +381,17 @@
     color 0.3s,
     transform 0.2s;
 }
+
 .combo-mult.combo-mid {
   color: #f39c12;
   animation: comboPulse 0.4s ease;
 }
+
 .combo-mult.combo-high {
   color: #e67e22;
   animation: comboPulse 0.4s ease;
 }
+
 .combo-mult.combo-ultra {
   color: #e74c3c;
   animation: comboGlow 1s ease infinite alternate;
@@ -344,11 +404,13 @@
   gap: 7px;
   min-width: 110px;
 }
+
 .mood-label {
   font-size: 11px;
   color: #7f8c8d;
   white-space: nowrap;
 }
+
 .mood-bar-container {
   flex: 1;
   height: 11px;
@@ -357,6 +419,7 @@
   overflow: hidden;
   min-width: 70px;
 }
+
 .mood-bar {
   height: 100%;
   background: #2ecc71;
@@ -365,9 +428,11 @@
     width 0.4s ease,
     background 0.4s;
 }
+
 .mood-bar.mood-low {
   background: #f39c12;
 }
+
 .mood-bar.mood-critical {
   background: #e74c3c;
   animation: moodPulse 0.6s ease infinite alternate;
@@ -378,6 +443,7 @@
   display: flex;
   gap: 7px;
 }
+
 .booster-btn {
   padding: 5px 9px;
   font-size: 10px;
@@ -391,23 +457,28 @@
   transition: all 0.2s;
   min-width: 72px;
 }
+
 .booster-btn:hover:not(:disabled) {
   background: #f1f8e9;
   border-color: #7dcea0;
 }
+
 .booster-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .booster-btn.booster-active {
   background: #d5f5e3;
   border-color: #2ecc71;
   color: #1a7a3e;
 }
+
 .booster-btn.booster-cant-afford {
   border-color: #e74c3c;
   color: #c0392b;
 }
+
 .booster-btn.booster-locked {
   opacity: 0.45;
   border-style: dashed;
@@ -428,6 +499,7 @@
   justify-content: center;
   z-index: 1000;
 }
+
 .plating-popup-content {
   background: #fdf0f4;
   padding: 28px;
@@ -439,6 +511,7 @@
   flex-direction: column;
   gap: 18px;
 }
+
 #plating-plate-area {
   background: #fff;
   border: 5px solid #f4a9b8;
@@ -450,6 +523,7 @@
   margin: 0 auto;
   width: 480px;
 }
+
 #plating-topping-bin {
   display: flex;
   gap: 10px;
@@ -459,11 +533,13 @@
   padding: 10px;
   border-radius: 10px;
 }
+
 .plating-actions {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
+
 .plating-actions button {
   padding: 10px 20px;
   font-size: 15px;
@@ -472,10 +548,12 @@
   cursor: pointer;
   border: 2px solid #5c3a21;
 }
+
 #plating-cancel {
   background: #e74c3c;
   color: white;
 }
+
 #plating-confirm {
   background: #2ecc71;
   color: white;
@@ -491,6 +569,7 @@
   justify-content: center;
   z-index: 1000;
 }
+
 .noodles-popup-content {
   background: #fdf8f0;
   padding: 28px;
@@ -503,6 +582,7 @@
   max-width: 460px;
   width: 90%;
 }
+
 #noodles-plate-area {
   width: 280px;
   height: 280px;
@@ -515,6 +595,7 @@
   background: #fff;
   flex-shrink: 0;
 }
+
 #noodles-step-img {
   width: 100%;
   height: 100%;
@@ -522,6 +603,7 @@
   display: block;
   transition: opacity 0.2s ease;
 }
+
 #noodles-hint {
   font-size: 15px;
   font-weight: 700;
@@ -529,12 +611,14 @@
   text-align: center;
   min-height: 22px;
 }
+
 #noodles-ingredient-bin {
   display: flex;
   gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
 }
+
 .noodles-ing-btn {
   display: flex;
   flex-direction: column;
@@ -551,14 +635,17 @@
   transition: opacity 0.25s;
   user-select: none;
 }
+
 .noodles-ing-btn span {
   font-size: 32px;
   line-height: 1;
 }
+
 .noodles-actions {
   display: flex;
   gap: 14px;
 }
+
 .noodles-actions button {
   padding: 10px 26px;
   font-size: 15px;
@@ -567,9 +654,22 @@
   border-radius: 10px;
   cursor: pointer;
 }
-#noodles-cancel  { background: #e74c3c; color: #fff; }
-#noodles-confirm { background: #2ecc71; color: #fff; }
-#noodles-confirm:disabled { background: #95a5a6; cursor: not-allowed; border-color: #7f8c8d; }
+
+#noodles-cancel {
+  background: #e74c3c;
+  color: #fff;
+}
+
+#noodles-confirm {
+  background: #2ecc71;
+  color: #fff;
+}
+
+#noodles-confirm:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  border-color: #7f8c8d;
+}
 
 /* ── Laphing mini-game popup ── */
 #laphing-popup {
@@ -581,6 +681,7 @@
   justify-content: center;
   z-index: 1000;
 }
+
 .laphing-popup-content {
   background: #fdf8f0;
   padding: 28px;
@@ -593,6 +694,7 @@
   max-width: 420px;
   width: 90%;
 }
+
 #laphing-plate-area {
   width: 280px;
   height: 280px;
@@ -602,9 +704,11 @@
   transition: background-position 0.3s ease, filter 0.15s;
   flex-shrink: 0;
 }
+
 .laphing-chop-flash {
   filter: brightness(1.5) saturate(1.4);
 }
+
 #laphing-hint {
   font-size: 15px;
   font-weight: 700;
@@ -612,11 +716,13 @@
   text-align: center;
   min-height: 22px;
 }
+
 #laphing-ingredient-bin {
   display: flex;
   gap: 20px;
   justify-content: center;
 }
+
 .laphing-ing-btn {
   display: flex;
   flex-direction: column;
@@ -633,14 +739,17 @@
   transition: opacity 0.25s;
   user-select: none;
 }
+
 .laphing-ing-btn span {
   font-size: 36px;
   line-height: 1;
 }
+
 .laphing-actions {
   display: flex;
   gap: 14px;
 }
+
 .laphing-actions button {
   padding: 10px 26px;
   font-size: 15px;
@@ -649,9 +758,22 @@
   border-radius: 10px;
   cursor: pointer;
 }
-#laphing-cancel  { background: #e74c3c; color: #fff; }
-#laphing-confirm { background: #2ecc71; color: #fff; }
-#laphing-confirm:disabled { background: #95a5a6; cursor: not-allowed; border-color: #7f8c8d; }
+
+#laphing-cancel {
+  background: #e74c3c;
+  color: #fff;
+}
+
+#laphing-confirm {
+  background: #2ecc71;
+  color: #fff;
+}
+
+#laphing-confirm:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  border-color: #7f8c8d;
+}
 
 /* ── Tally screen ── */
 #tally-screen {
@@ -666,6 +788,7 @@
   justify-content: center;
   z-index: 2000;
 }
+
 .tally-content {
   background: #fffdf5;
   border: 4px solid #5c3a21;
@@ -679,32 +802,39 @@
   gap: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
+
 .tally-title {
   font-size: 2rem;
   color: #5c3a21;
   margin: 0;
 }
+
 .tally-level-name {
   font-size: 1rem;
   color: #7a5c3a;
   font-style: italic;
 }
+
 .tally-stars {
   font-size: 2.5rem;
   letter-spacing: 8px;
 }
+
 .tally-star.filled {
   color: #f39c12;
 }
+
 .tally-star.empty {
   color: #bdc3c7;
 }
+
 .tally-stats {
   display: flex;
   flex-direction: column;
   gap: 8px;
   text-align: left;
 }
+
 .tally-row {
   display: flex;
   justify-content: space-between;
@@ -712,41 +842,50 @@
   border-bottom: 1px solid #ede8d8;
   font-size: 15px;
 }
+
 .tally-val {
   font-weight: bold;
   color: #27ae60;
 }
+
 .tally-tip {
   color: #2980b9;
 }
+
 .tally-expense {
   color: #e74c3c;
 }
+
 .tally-total-row {
   border-top: 2px solid #5c3a21;
   border-bottom: none;
   font-size: 17px;
   margin-top: 4px;
 }
+
 .tally-total {
   color: #5c3a21;
   font-size: 18px;
 }
+
 .tally-session-row {
   font-size: 13px;
   color: #7a5c3a;
   border-bottom: none;
 }
+
 .tally-upgrades {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .tally-upgrades-title {
   font-weight: bold;
   color: #5c3a21;
   font-size: 14px;
 }
+
 .upgrade-btn {
   padding: 10px 16px;
   border-radius: 8px;
@@ -761,22 +900,27 @@
   align-items: center;
   gap: 2px;
 }
+
 .upgrade-btn:hover:not(:disabled) {
   background: #ffe0b2;
 }
+
 .upgrade-btn small {
   font-weight: normal;
   font-size: 11px;
   color: #7a5c3a;
 }
+
 .upgrade-btn-disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .upgrade-hint {
   font-size: 12px;
   color: #e74c3c;
 }
+
 .upgrade-owned {
   font-size: 13px;
   color: #27ae60;
@@ -784,6 +928,7 @@
   background: #eafaf1;
   border-radius: 6px;
 }
+
 .tally-gate {
   padding: 10px 14px;
   border-radius: 8px;
@@ -791,22 +936,26 @@
   font-weight: bold;
   text-align: center;
 }
+
 .gate-met {
   background: #eafaf1;
   color: #1e8449;
   border: 1px solid #2ecc71;
 }
+
 .gate-unmet {
   background: #fdedec;
   color: #c0392b;
   border: 1px solid #e74c3c;
 }
+
 .tally-actions {
   display: flex;
   justify-content: center;
   gap: 16px;
   margin-top: 8px;
 }
+
 .tally-btn {
   padding: 12px 28px;
   font-size: 15px;
@@ -816,20 +965,25 @@
   border: 2px solid #5c3a21;
   transition: all 0.2s;
 }
+
 .tally-btn-primary {
   background: #27ae60;
   color: white;
 }
+
 .tally-btn-primary:hover {
   background: #1e8449;
 }
+
 .tally-btn-secondary {
   background: #ecf0f1;
   color: #5c3a21;
 }
+
 .tally-btn-secondary:hover {
   background: #d5d8dc;
 }
+
 .tally-btn-locked {
   background: #bdc3c7;
   color: #7f8c8d;

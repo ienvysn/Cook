@@ -22,6 +22,7 @@ export class FloorScene {
         this.comboSystem  = s.comboSystem  || null;
         this.moodSystem   = s.moodSystem   || null;
         this.boosterSystem = s.boosterSystem || null;
+        this.audioManager  = s.audioManager  || null;
         this.upgrades     = s.upgrades     || { fasterSteamer: false };
         this.onLevelEnd   = s.onLevelEnd   || null; // (stats) => void
 
@@ -160,6 +161,7 @@ export class FloorScene {
             const station = new Station(stConfig, this.gameClock);
             station.boosterSystem = this.boosterSystem;
             station.upgrades      = this.upgrades;
+            station.audioManager  = this.audioManager;
             // Laphing-tray skips cooking and opens the mini-game popup directly
             if (stConfig.type === 'laphing-tray' && this.laphingScene) {
                 station.onInstantOpen = () => this.laphingScene.open();
@@ -174,7 +176,7 @@ export class FloorScene {
         platingCounterEl.id = 'plating-counter-dropzone';
         platingCounterEl.innerHTML = `
             <div style="font-size:16px;color:#5c3a21;font-weight:bold;margin-bottom:5px;">Plating Counter</div>
-            <div id="plating-counter-items" style="width:220px;height:90px;border:4px dashed #f4a9b8;border-radius:20px;display:flex;align-items:center;justify-content:flex-start;background:white;padding:10px;gap:10px;overflow:hidden;">
+            <div id="plating-counter-items" style="width:220px;flex:1;min-height:90px;border:4px dashed #f4a9b8;border-radius:20px;display:flex;align-items:center;justify-content:center;align-content:center;background:white;padding:10px;gap:8px;overflow:hidden;flex-wrap:wrap;">
                 <div id="plating-counter-empty-text" style="font-size:10px;color:#a8957a;text-align:center;width:100%;">Drop cooked<br>items here</div>
             </div>
         `;
@@ -190,7 +192,7 @@ export class FloorScene {
                     return;
                 }
                 const itemsContainer = document.getElementById('plating-counter-items');
-                if (itemsContainer && itemsContainer.querySelectorAll('.plated-item').length >= 3) {
+                if (itemsContainer && itemsContainer.querySelectorAll('.plated-item').length >= 6) {
                     if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
                     return;
                 }
@@ -371,6 +373,9 @@ export class FloorScene {
             this.tips        += tip;
             this.servedCount += 1;
             this.updateHUD();
+
+            // Play coin jingle on payment
+            if (this.audioManager) this.audioManager.playCoins();
 
             if (result.toppingAccuracy === 1.0) {
                 const label = comboMult > 1.0 ? `Perfect! x${comboMult.toFixed(1)}` : 'Perfect!';

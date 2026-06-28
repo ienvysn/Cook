@@ -33,6 +33,7 @@ export class Station {
         // Set by FloorScene after construction
         this.boosterSystem = null;
         this.upgrades      = null;
+        this.audioManager  = null;
     }
 
     render(dragManager) {
@@ -97,6 +98,13 @@ export class Station {
             uiNeedsUpdate: true
         };
 
+        // Start cooking sound for this station type
+        if (this.audioManager) {
+            if (this.type === 'fry-pan')     this.audioManager.startFrying();
+            if (this.type === 'cooking-pot') this.audioManager.startBoiling();
+            if (this.type === 'steamer')     this.audioManager.startSteam();
+        }
+
         this.updateSlotUI(index);
     }
 
@@ -120,6 +128,9 @@ export class Station {
                     slot.burnProgress = 0;
                     slot.burnTime = slot.maxTime * 1.5;
                     slot.uiNeedsUpdate = true;
+
+                    // Stop cooking sound if no other slots are still cooking
+                    this._stopCookingSoundIfDone();
                 }
             } else if (slot && slot.state === 'ready') {
                 slot.burnProgress += delta;
@@ -180,5 +191,19 @@ export class Station {
     clearSlot(index) {
         this.slots[index] = null;
         this.updateSlotUI(index);
+
+        // Stop cooking sound if no other slots are still cooking
+        this._stopCookingSoundIfDone();
+    }
+
+    /** Stop the station's cooking sound only when no slots remain in 'cooking' state. */
+    _stopCookingSoundIfDone() {
+        if (!this.audioManager) return;
+        const stillCooking = this.slots.some(s => s && s.state === 'cooking');
+        if (!stillCooking) {
+            if (this.type === 'fry-pan')     this.audioManager.stopFrying();
+            if (this.type === 'cooking-pot') this.audioManager.stopBoiling();
+            if (this.type === 'steamer')     this.audioManager.stopSteam();
+        }
     }
 }

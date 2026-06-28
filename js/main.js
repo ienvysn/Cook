@@ -1,6 +1,7 @@
 import { GameClock }     from './core/GameClock.js';
 import { DragManager }   from './core/DragManager.js';
 import { EventBus }      from './core/EventBus.js';
+import { AudioManager }  from './core/AudioManager.js';
 import { ComboSystem }   from './systems/ComboSystem.js';
 import { MoodSystem }    from './systems/MoodSystem.js';
 import { BoosterSystem } from './systems/BoosterSystem.js';
@@ -22,10 +23,11 @@ const sessionState = {
     currentLevelIndex: 0
 };
 
-const clock       = new GameClock();
+const clock        = new GameClock();
+const audioManager = new AudioManager();
 const gameContainer = document.getElementById('game-container');
-const tallyEl     = document.getElementById('tally-screen');
-const tallyScreen = new TallyScreen(tallyEl);
+const tallyEl      = document.getElementById('tally-screen');
+const tallyScreen  = new TallyScreen(tallyEl);
 
 // DragManager is created once and reused; scenes register their own zones each run.
 let dragManager = null;
@@ -49,14 +51,15 @@ function startLevel(levelIndex) {
         comboSystem,
         moodSystem,
         boosterSystem,
+        audioManager,
         upgrades: sessionState.upgrades,
         onLevelEnd: (stats) => onLevelEnd(stats, { eventBus, boosterSystem })
     };
 
     const floorScene   = new FloorScene(clock, dragManager, levelConfig, systems);
-    const platingScene = new PlatingScene(clock, dragManager, floorScene, boosterSystem);
-    const laphingScene = new LaphingScene(clock, dragManager);
-    const noodlesScene = new NoodlesScene(clock, dragManager, floorScene);
+    const platingScene = new PlatingScene(clock, dragManager, floorScene, boosterSystem, audioManager);
+    const laphingScene = new LaphingScene(clock, dragManager, audioManager);
+    const noodlesScene = new NoodlesScene(clock, dragManager, floorScene, audioManager);
     floorScene.setPlatingScene(platingScene);
     floorScene.setLaphingScene(laphingScene);
     floorScene.setNoodlesScene(noodlesScene);
@@ -66,6 +69,7 @@ function startLevel(levelIndex) {
     floorScene.render(gameContainer);
 
     if (!clock.isRunning) clock.start();
+    audioManager.startAmbient();
 
     // Store refs for later cleanup
     sessionState._floorScene   = floorScene;

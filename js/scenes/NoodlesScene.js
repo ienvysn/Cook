@@ -26,10 +26,11 @@ const INGREDIENTS = [
 ];
 
 export class NoodlesScene {
-    constructor(gameClock, dragManager, floorScene) {
+    constructor(gameClock, dragManager, floorScene, audioManager) {
         this.gameClock   = gameClock;
         this.dragManager = dragManager;
         this.floorScene  = floorScene;
+        this.audioManager = audioManager || null;
 
         this.popupEl    = document.getElementById('noodles-popup');
         this.stepImg    = document.getElementById('noodles-step-img');
@@ -70,6 +71,10 @@ export class NoodlesScene {
     _onIngredientDrop(itemType) {
         const ing = INGREDIENTS.find(i => i.id === itemType);
         if (!ing || ing.step !== this.step) return;
+
+        // Play plating sound when an ingredient is placed
+        if (this.audioManager) this.audioManager.playPlating();
+
         this._advanceTo(this.step + 1);
     }
 

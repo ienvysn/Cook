@@ -2,11 +2,12 @@ import { ITEM_REGISTRY, TOPPING_REGISTRY, renderIcon } from '../data/items.js';
 import { PLATING_TIME_SCALE } from '../data/config.js';
 
 export class PlatingScene {
-    constructor(gameClock, dragManager, floorScene, boosterSystem) {
+    constructor(gameClock, dragManager, floorScene, boosterSystem, audioManager) {
         this.gameClock     = gameClock;
         this.dragManager   = dragManager;
         this.floorScene    = floorScene;
         this.boosterSystem = boosterSystem || null;
+        this.audioManager  = audioManager || null;
 
         this.popupEl    = document.getElementById('plating-popup');
         this.closeBtn   = document.getElementById('plating-cancel');
@@ -30,6 +31,9 @@ export class PlatingScene {
                 const toppingId = toppingType.replace('topping-', '');
                 this.selectedToppings.add(toppingId);
                 this.renderPlateArea();
+
+                // Play plating sound when a topping is placed
+                if (this.audioManager) this.audioManager.playPlating();
             }
         });
     }

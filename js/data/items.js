@@ -11,7 +11,7 @@ export const ITEM_REGISTRY = {
         placeholder: { emoji: '🟠', color: '#c87a2a' },
         sprite:     'assets/icons/images/friedmomoo.jpeg',
         hotbarIcon: 'assets/icons/images/1momo.jpeg',
-        platedIcon: 'assets/icons/images/friedmomoo.jpeg',
+        platedIcon: 'assets/icons/images/friedmomo.png',
         validToppings: ['green-onion'],
         cookTimeMs: 5000
     },
