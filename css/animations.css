@@ -24,6 +24,20 @@
     100% { transform: translate(-50%, -220%); opacity: 0; }
 }
 
+/* Confetti particles falling */
+@keyframes confettiFall {
+    0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+/* Level complete banner pop */
+@keyframes levelCompleteBanner {
+    0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+    65%  { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+}
+
 /* Booster active shimmer */
 @keyframes boosterShimmer {
     0%   { background-position: -200% center; }

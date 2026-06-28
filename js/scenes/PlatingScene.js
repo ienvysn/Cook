@@ -62,16 +62,47 @@ export class PlatingScene {
 
             const btn = document.createElement('div');
             btn.className = 'topping-button draggable';
-            btn.innerHTML = renderIcon(topping);
-            btn.style.cssText = 'cursor:grab;width:64px;height:64px;display:flex;align-items:center;justify-content:center;';
-            this.toppingBin.appendChild(btn);
+            btn.style.cssText = 'cursor:grab;display:flex;flex-direction:column;align-items:center;gap:4px;';
 
+            const iconWrap = document.createElement('div');
+            iconWrap.style.cssText = 'width:64px;height:64px;display:flex;align-items:center;justify-content:center;';
+            iconWrap.innerHTML = renderIcon(topping);
+            btn.appendChild(iconWrap);
+
+            if (topping.label) {
+                const lbl = document.createElement('div');
+                lbl.style.cssText = 'font-size:10px;font-weight:700;color:#5c3a21;text-align:center;max-width:72px;line-height:1.2;';
+                lbl.textContent = topping.label;
+                btn.appendChild(lbl);
+            }
+
+            this.toppingBin.appendChild(btn);
             this.dragManager.registerDraggable(btn, { itemType: `topping-${toppingId}`, scene: 'plating' });
         });
     }
 
     renderPlateArea() {
         if (!this.currentItem) return;
+
+        // Momo / fried-momo: show serving image with optional green-onion scatter
+        if (this.currentItem === 'momo' || this.currentItem === 'fried-momo') {
+            const imgSrc       = ITEM_REGISTRY[this.currentItem].platedIcon;
+            const hasOnion     = this.selectedToppings.has('green-onion');
+            const onionOverlay = hasOnion
+                ? `<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+                               font-size:26px;letter-spacing:2px;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.4));">
+                       🌿🌿🌿
+                   </div>`
+                : '';
+            this.plateArea.innerHTML = `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${imgSrc}" draggable="false"
+                         style="max-width:300px;max-height:200px;object-fit:contain;border-radius:12px;display:block;" />
+                    ${onionOverlay}
+                </div>
+            `;
+            return;
+        }
 
         const item     = ITEM_REGISTRY[this.currentItem];
         const itemHtml = renderIcon(item);
@@ -126,7 +157,9 @@ export class PlatingScene {
             const emptyText = document.getElementById('plating-counter-empty-text');
             if (emptyText) emptyText.remove();
 
-            const baseItemHtml = renderIcon(ITEM_REGISTRY[this.currentItem]);
+            const reg          = ITEM_REGISTRY[this.currentItem];
+            const displaySrc   = reg.platedIcon || reg.hotbarIcon || reg.sprite;
+            const baseItemHtml = `<img src="${displaySrc}" class="item-icon food-img" draggable="false" />`;
             let miniToppingsHtml = '';
             Array.from(this.selectedToppings).forEach((toppingId, i) => {
                 const angle    = (i * (Math.PI * 2) / Math.max(this.selectedToppings.size, 1));
@@ -147,7 +180,7 @@ export class PlatingScene {
             itemWrapper.setAttribute('data-toppings', JSON.stringify(Array.from(this.selectedToppings)));
 
             itemsContainer.appendChild(itemWrapper);
-            this.dragManager.registerDraggable(itemWrapper, { itemType: `plated-${this.currentItem}`, scene: 'floor' });
+            this.dragManager.registerDraggable(itemWrapper, { itemType: `plated-${this.currentItem}`, scene: 'floor', dragPreviewSrc: displaySrc });
         }
 
         this.cleanup();

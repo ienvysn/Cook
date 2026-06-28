@@ -33,6 +33,36 @@
         </div>
     </div>
 
+    <!-- Keema noodles plating popup -->
+    <div id="noodles-popup" style="display:none;">
+        <div class="noodles-popup-content">
+            <h2 style="margin:0;color:#5c3a21;">🍜 Keema Noodles</h2>
+            <div id="noodles-plate-area">
+                <img id="noodles-step-img" src="" draggable="false" />
+            </div>
+            <div id="noodles-hint"></div>
+            <div id="noodles-ingredient-bin"></div>
+            <div class="noodles-actions">
+                <button id="noodles-cancel">Cancel</button>
+                <button id="noodles-confirm" disabled>Serve!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Laphing prep mini-game popup -->
+    <div id="laphing-popup" style="display:none;">
+        <div class="laphing-popup-content">
+            <h2 style="margin:0;color:#5c3a21;">🫔 Making Laphing</h2>
+            <div id="laphing-plate-area"></div>
+            <div id="laphing-hint"></div>
+            <div id="laphing-ingredient-bin"></div>
+            <div class="laphing-actions">
+                <button id="laphing-cancel">Cancel</button>
+                <button id="laphing-confirm" disabled>Serve!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Tally screen — shown by TallyScreen.show(), content injected dynamically -->
     <div id="tally-screen" style="display:none;"></div>
 

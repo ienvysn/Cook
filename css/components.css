@@ -1,188 +1,847 @@
-/* ── Item icons ── */
+/* ── Item icons (hotbar, order bubbles) ── */
 .item-icon {
-    width: 64px; height: 64px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px; border-radius: 8px; user-select: none;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border-radius: 8px;
+  user-select: none;
+}
+.item-icon.food-img {
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 8px;
 }
 
-/* ── Hotbar ── */
-.hotbar { text-align: center; color: white; }
-.hotbar h3 { margin: 0 0 10px 0; }
-.hotbar-slots { display: flex; gap: 15px; }
-.hotbar-slot { cursor: grab; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; }
+/* ── Hotbar — horizontal bar at the bottom ── */
+.hotbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.hotbar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8c87a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.hotbar-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hotbar-slot {
+  cursor: grab;
+  border-radius: 10px;
+  border: 2px solid #c8a96e;
+  background: rgba(255, 248, 220, 0.15);
+  padding: 5px;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.hotbar-slot:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(255, 200, 100, 0.5);
+}
 
-/* ── Station ── */
-.station { background: #ecf0f1; padding: 15px; border-radius: 10px; text-align: center; }
-.station-slots { display: flex; gap: 10px; margin-top: 10px; }
+/* ── Station container — transparent so slots sit directly on counter ── */
+.station {
+  background: transparent;
+  padding: 0 6px 0;
+  border-radius: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.station-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+/* ── Station slots grid — wraps to 2×2 for 4-slot steamer ── */
+.station-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  max-width: 310px;
+  border-radius: 10px;
+  border: 2px solid rgba(59, 59, 59, 0.3);
+}
+
+/* ── Station slot — sprite-based ──
+   Each slot IS the sprite frame via background-image + background-position.
+   State classes control which frame is visible.
+   ──────────────────────────────────────────
+   4-frame horizontal sprites (steamer, fry-pan, cooking-pot):
+     background-size: 400% → preserves natural aspect ratio (auto height)
+     Frame positions (offset / (total - 1 frame) * 100):
+       Col 0 (empty)   →  0.00%
+       Col 1 (cooking) → 33.33%
+       Col 2 (ready)   → 66.67%
+       Col 3 (burnt)   → 100.00%
+   ──────────────────────────────────────────
+   Laphing 3×2 grid (laphingsheet.png):
+     background-size: 300% 200%  → 3 cols × 2 rows
+       (0,0) empty plate  →  0%   0%
+       (1,0) partial      → 50%   0%
+       (2,0) burnt look   → 100%  0%  + filter
+       (0,1) full laphing →  0% 100%
+── */
 .station-slot {
-    width: 80px; height: 80px; background: #bdc3c7;
-    border-radius: 8px; display: flex; align-items: center;
-    justify-content: center; position: relative; border: 2px dashed #7f8c8d;
-}
-.cook-progress-bar {
-    position: absolute; bottom: 5px; left: 5px; right: 5px;
-    height: 6px; background: #34495e; border-radius: 3px; overflow: hidden;
-}
-.cook-progress { height: 100%; background: #2ecc71; width: 0%; transition: width 0.1s linear; }
-.ready-item {
-    cursor: grab; width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
+  width: 150px;
+
+  border-radius: 10px;
+  position: relative;
+  cursor: default;
+  background-repeat: no-repeat;
+  /* 400% (= 400% auto) preserves the sprite's natural aspect ratio — no vertical squishing */
+  background-size: 400%; /* default to empty frame */
+
 }
 
-/* ── Customer ── */
+/* ── Assign sprite sheets per station type ── */
+.station-steamer .station-slot {
+  background-image: url("../assets/icons/images/momo.png");
+  background-size: 400%;
+  height: 160px;
+}
+.station-fry-pan .station-slot {
+  background-image: url("../assets/icons/images/finalfryingpan asset.png");
+  background-size: 400%;
+  height: 160px;
+}
+.station-fry-pan .station-slots {
+  max-width: 200px;
+}
+.station-cooking-pot .station-slot {
+  background-image: url("../assets/icons/images/keemanoodle.png");
+  background-size: 400%;
+  height: 160px;
+}
+.station-cooking-pot .station-slots {
+  max-width: 155px;
+}
+.station-laphing-tray .station-slot {
+  background-image: url("../assets/icons/images/laphingprep.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 325px;
+  width: 300px;
+}
+
+/* ── Sprite frame states — cooking-pot (center-anchored) ── */
+.station-cooking-pot .station-slot.state-empty    { background-position: 0%      70%; }
+.station-cooking-pot .station-slot.state-cooking  { background-position: 30%  70%; }
+.station-cooking-pot .station-slot.state-ready    { background-position: 59%  70%; }
+.station-cooking-pot .station-slot.state-burnt    { background-position: 98%    70%; }
+
+/* ── Fry-pan: correct 4-frame X positions, centered vertically ── */
+.station-fry-pan .station-slot.state-empty        { background-position: 30%      10%; }
+.station-fry-pan .station-slot.state-cooking      { background-position: 75%  10%; }
+.station-fry-pan .station-slot.state-ready        { background-position: 28%  85%; }
+.station-fry-pan .station-slot.state-burnt        { background-position: 76%   85%; }
+
+/* ── Steamer: top-anchored so image locks to the same Y across all states ── */
+.station-steamer .station-slot.state-empty        { background-position: 0%      top; }
+.station-steamer .station-slot.state-cooking      { background-position: 33.33%  top; }
+.station-steamer .station-slot.state-ready        { background-position: 66.67%  top; }
+.station-steamer .station-slot.state-burnt        { background-position: 100%    top; }
+
+/* ── Laphing: single static image, same position for all states ── */
+.station-laphing-tray .station-slot.state-empty,
+.station-laphing-tray .station-slot.state-cooking,
+.station-laphing-tray .station-slot.state-ready  { background-position: center; }
+.station-laphing-tray .station-slot.state-burnt  {
+  background-position: center;
+  filter: brightness(0.42) sepia(0.7);
+}
+
+/* ── Progress bar (overlays the sprite) ── */
+.cook-progress-bar {
+  position: absolute;
+  bottom: 5px;
+  left: 6px;
+  right: 6px;
+  height: 7px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.cook-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+  width: 0%;
+  transition: width 0.1s linear;
+  border-radius: 4px;
+}
+
+/* ── Slot interaction handle (transparent full-cover drag overlay) ── */
+.slot-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: grab;
+}
+.slot-handle:active {
+  cursor: grabbing;
+}
+
+/* ── Ready pulse ring on the handle ── */
+.ready-item.slot-handle {
+  animation: readyPulse 1.4s ease-in-out infinite;
+}
+
+/* ── Customer card ── */
 .customer {
-    background: #fff; border-radius: 10px; padding: 15px;
-    text-align: center; width: 120px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px dashed transparent;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0;
+  text-align: center;
+  width: 140px;
+  margin-bottom: -80px; /* body extends behind counter */
 }
 .customer-avatar {
-    width: 60px; height: 60px; margin: 0 auto 10px;
-    border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 30px;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
 }
 .customer-order-bubble {
-    font-size: 14px; margin-bottom: 10px;
-    background: #f1f2f6; padding: 5px; border-radius: 5px; font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 8px;
+  background: #f1f2f6;
+  padding: 4px;
+  border-radius: 5px;
+  font-weight: bold;
 }
-.patience-bar-container { height: 8px; background: #ecf0f1; border-radius: 4px; overflow: hidden; }
-.patience-bar { height: 100%; background: #2ecc71; width: 100%; transition: width 0.1s linear; }
+.customer-order-bubble .item-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto;
+}
+.patience-bar-container {
+  height: 7px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.patience-bar {
+  height: 100%;
+  background: #2ecc71;
+  width: 100%;
+  transition: width 0.1s linear;
+}
+
+
+/* ── Plating counter — stays on counter surface ── */
+.station.plating-counter {
+  background: rgba(255, 248, 235, 0.82);
+  backdrop-filter: blur(4px);
+  border: 2px solid #f4a9b8;
+  border-radius: 10px;
+  padding: 8px 10px;
+  align-self: flex-end;
+  margin-bottom: 100px;
+}
+
+/* ── Dustbin — outside the counter, inside #dustbin-area absolute div ── */
+.station.dustbin {
+  background: rgba(40, 20, 5, 0.8);
+  backdrop-filter: blur(6px);
+  border: 2px dashed #a0956a;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
 
 /* ── HUD ── */
 #hud {
-    position: absolute; top: 10px; left: 10px; right: 10px;
-    background: rgba(255,255,255,0.95); padding: 10px 16px;
-    border-radius: 10px; display: flex; gap: 20px; align-items: center;
-    font-weight: bold; z-index: 10; flex-wrap: wrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.93);
+  padding: 8px 14px;
+  border-radius: 10px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-weight: bold;
+  z-index: 10;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
-#hud-stats { display: flex; gap: 16px; font-size: 14px; }
+#hud-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+}
 
 /* ── Combo counter ── */
-#hud-combo { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-.combo-streak { font-size: 12px; color: #7f8c8d; }
-.combo-mult {
-    font-size: 18px; font-weight: 900; color: #27ae60;
-    transition: color 0.3s, transform 0.2s;
+#hud-combo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
 }
-.combo-mult.combo-mid  { color: #f39c12; animation: comboPulse 0.4s ease; }
-.combo-mult.combo-high { color: #e67e22; animation: comboPulse 0.4s ease; }
-.combo-mult.combo-ultra { color: #e74c3c; animation: comboGlow 1s ease infinite alternate; }
+.combo-streak {
+  font-size: 11px;
+  color: #7f8c8d;
+}
+.combo-mult {
+  font-size: 17px;
+  font-weight: 900;
+  color: #27ae60;
+  transition:
+    color 0.3s,
+    transform 0.2s;
+}
+.combo-mult.combo-mid {
+  color: #f39c12;
+  animation: comboPulse 0.4s ease;
+}
+.combo-mult.combo-high {
+  color: #e67e22;
+  animation: comboPulse 0.4s ease;
+}
+.combo-mult.combo-ultra {
+  color: #e74c3c;
+  animation: comboGlow 1s ease infinite alternate;
+}
 
 /* ── Mood meter ── */
-#hud-mood { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-.mood-label { font-size: 12px; color: #7f8c8d; white-space: nowrap; }
+#hud-mood {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 110px;
+}
+.mood-label {
+  font-size: 11px;
+  color: #7f8c8d;
+  white-space: nowrap;
+}
 .mood-bar-container {
-    flex: 1; height: 12px; background: #ecf0f1;
-    border-radius: 6px; overflow: hidden; min-width: 80px;
+  flex: 1;
+  height: 11px;
+  background: #ecf0f1;
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 70px;
 }
 .mood-bar {
-    height: 100%; background: #2ecc71; border-radius: 6px;
-    transition: width 0.4s ease, background 0.4s;
+  height: 100%;
+  background: #2ecc71;
+  border-radius: 6px;
+  transition:
+    width 0.4s ease,
+    background 0.4s;
 }
-.mood-bar.mood-low      { background: #f39c12; }
-.mood-bar.mood-critical { background: #e74c3c; animation: moodPulse 0.6s ease infinite alternate; }
+.mood-bar.mood-low {
+  background: #f39c12;
+}
+.mood-bar.mood-critical {
+  background: #e74c3c;
+  animation: moodPulse 0.6s ease infinite alternate;
+}
 
 /* ── Booster buttons ── */
-#hud-boosters { display: flex; gap: 8px; }
-.booster-btn {
-    padding: 6px 10px; font-size: 11px; font-weight: bold;
-    border-radius: 8px; cursor: pointer; border: 2px solid #bdc3c7;
-    background: #fff; text-align: center; line-height: 1.3;
-    transition: all 0.2s; min-width: 80px;
+#hud-boosters {
+  display: flex;
+  gap: 7px;
 }
-.booster-btn:hover:not(:disabled) { background: #f1f8e9; border-color: #7dcea0; }
-.booster-btn:disabled              { opacity: 0.5; cursor: not-allowed; }
-.booster-btn.booster-active        { background: #d5f5e3; border-color: #2ecc71; color: #1a7a3e; }
-.booster-btn.booster-cant-afford   { border-color: #e74c3c; color: #c0392b; }
+.booster-btn {
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid #bdc3c7;
+  background: #fff;
+  text-align: center;
+  line-height: 1.3;
+  transition: all 0.2s;
+  min-width: 72px;
+}
+.booster-btn:hover:not(:disabled) {
+  background: #f1f8e9;
+  border-color: #7dcea0;
+}
+.booster-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.booster-btn.booster-active {
+  background: #d5f5e3;
+  border-color: #2ecc71;
+  color: #1a7a3e;
+}
+.booster-btn.booster-cant-afford {
+  border-color: #e74c3c;
+  color: #c0392b;
+}
+.booster-btn.booster-locked {
+  opacity: 0.45;
+  border-style: dashed;
+  color: #95a5a6;
+  cursor: not-allowed;
+}
 
 /* ── Plating popup ── */
 #plating-popup {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.6);
-    display: flex; align-items: center; justify-content: center; z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 .plating-popup-content {
-    background: #fdf0f4; padding: 30px; border-radius: 20px;
-    border: 4px solid #5c3a21; width: 800px; text-align: center;
-    display: flex; flex-direction: column; gap: 20px;
+  background: #fdf0f4;
+  padding: 28px;
+  border-radius: 20px;
+  border: 4px solid #5c3a21;
+  width: 800px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 #plating-plate-area {
-    background: #fff; border: 5px solid #f4a9b8; border-radius: 50px;
-    height: 250px; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto; width: 500px;
+  background: #fff;
+  border: 5px solid #f4a9b8;
+  border-radius: 50px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 480px;
 }
 #plating-topping-bin {
-    display: flex; gap: 10px; justify-content: center; min-height: 120px;
-    background: rgba(255,255,255,0.5); padding: 10px; border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  min-height: 110px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  border-radius: 10px;
 }
-.plating-actions { display: flex; justify-content: center; gap: 20px; }
+.plating-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
 .plating-actions button {
-    padding: 10px 20px; font-size: 16px; font-weight: bold;
-    border-radius: 8px; cursor: pointer; border: 2px solid #5c3a21;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid #5c3a21;
 }
-#plating-cancel  { background: #e74c3c; color: white; }
-#plating-confirm { background: #2ecc71; color: white; }
+#plating-cancel {
+  background: #e74c3c;
+  color: white;
+}
+#plating-confirm {
+  background: #2ecc71;
+  color: white;
+}
+
+/* ── Keema noodles plating popup ── */
+#noodles-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.noodles-popup-content {
+  background: #fdf8f0;
+  padding: 28px;
+  border-radius: 20px;
+  border: 4px solid #5c3a21;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 460px;
+  width: 90%;
+}
+#noodles-plate-area {
+  width: 280px;
+  height: 280px;
+  border-radius: 16px;
+  border: 3px solid #c8a96e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  flex-shrink: 0;
+}
+#noodles-step-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+#noodles-hint {
+  font-size: 15px;
+  font-weight: 700;
+  color: #5c3a21;
+  text-align: center;
+  min-height: 22px;
+}
+#noodles-ingredient-bin {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.noodles-ing-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 3px solid #c8a96e;
+  border-radius: 14px;
+  background: #fffbe8;
+  cursor: grab;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5c3a21;
+  transition: opacity 0.25s;
+  user-select: none;
+}
+.noodles-ing-btn span {
+  font-size: 32px;
+  line-height: 1;
+}
+.noodles-actions {
+  display: flex;
+  gap: 14px;
+}
+.noodles-actions button {
+  padding: 10px 26px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 2px solid #5c3a21;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#noodles-cancel  { background: #e74c3c; color: #fff; }
+#noodles-confirm { background: #2ecc71; color: #fff; }
+#noodles-confirm:disabled { background: #95a5a6; cursor: not-allowed; border-color: #7f8c8d; }
+
+/* ── Laphing mini-game popup ── */
+#laphing-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.laphing-popup-content {
+  background: #fdf8f0;
+  padding: 28px;
+  border-radius: 20px;
+  border: 4px solid #5c3a21;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 420px;
+  width: 90%;
+}
+#laphing-plate-area {
+  width: 280px;
+  height: 280px;
+  border-radius: 16px;
+  border: 3px solid #c8a96e;
+  overflow: hidden;
+  transition: background-position 0.3s ease, filter 0.15s;
+  flex-shrink: 0;
+}
+.laphing-chop-flash {
+  filter: brightness(1.5) saturate(1.4);
+}
+#laphing-hint {
+  font-size: 15px;
+  font-weight: 700;
+  color: #5c3a21;
+  text-align: center;
+  min-height: 22px;
+}
+#laphing-ingredient-bin {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+.laphing-ing-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border: 3px solid #c8a96e;
+  border-radius: 14px;
+  background: #fffbe8;
+  cursor: grab;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5c3a21;
+  transition: opacity 0.25s;
+  user-select: none;
+}
+.laphing-ing-btn span {
+  font-size: 36px;
+  line-height: 1;
+}
+.laphing-actions {
+  display: flex;
+  gap: 14px;
+}
+.laphing-actions button {
+  padding: 10px 26px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 2px solid #5c3a21;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#laphing-cancel  { background: #e74c3c; color: #fff; }
+#laphing-confirm { background: #2ecc71; color: #fff; }
+#laphing-confirm:disabled { background: #95a5a6; cursor: not-allowed; border-color: #7f8c8d; }
 
 /* ── Tally screen ── */
 #tally-screen {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.75);
-    display: flex; align-items: center; justify-content: center; z-index: 2000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
 .tally-content {
-    background: #fffdf5; border: 4px solid #5c3a21; border-radius: 20px;
-    padding: 36px 48px; min-width: 420px; max-width: 540px;
-    text-align: center; display: flex; flex-direction: column; gap: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  background: #fffdf5;
+  border: 4px solid #5c3a21;
+  border-radius: 20px;
+  padding: 36px 48px;
+  min-width: 420px;
+  max-width: 540px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
-.tally-title { font-size: 2rem; color: #5c3a21; margin: 0; }
-.tally-level-name { font-size: 1rem; color: #7a5c3a; font-style: italic; }
-
-/* Stars */
-.tally-stars { font-size: 2.5rem; letter-spacing: 8px; }
-.tally-star.filled { color: #f39c12; }
-.tally-star.empty  { color: #bdc3c7; }
-
-/* Stats rows */
-.tally-stats { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.tally-title {
+  font-size: 2rem;
+  color: #5c3a21;
+  margin: 0;
+}
+.tally-level-name {
+  font-size: 1rem;
+  color: #7a5c3a;
+  font-style: italic;
+}
+.tally-stars {
+  font-size: 2.5rem;
+  letter-spacing: 8px;
+}
+.tally-star.filled {
+  color: #f39c12;
+}
+.tally-star.empty {
+  color: #bdc3c7;
+}
+.tally-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
 .tally-row {
-    display: flex; justify-content: space-between; padding: 6px 0;
-    border-bottom: 1px solid #ede8d8; font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #ede8d8;
+  font-size: 15px;
 }
-.tally-val         { font-weight: bold; color: #27ae60; }
-.tally-tip         { color: #2980b9; }
-.tally-expense     { color: #e74c3c; }
-.tally-total-row   { border-top: 2px solid #5c3a21; border-bottom: none; font-size: 17px; margin-top: 4px; }
-.tally-total       { color: #5c3a21; font-size: 18px; }
-.tally-session-row { font-size: 13px; color: #7a5c3a; border-bottom: none; }
-
-/* Upgrades */
-.tally-upgrades { display: flex; flex-direction: column; gap: 8px; }
-.tally-upgrades-title { font-weight: bold; color: #5c3a21; font-size: 14px; }
+.tally-val {
+  font-weight: bold;
+  color: #27ae60;
+}
+.tally-tip {
+  color: #2980b9;
+}
+.tally-expense {
+  color: #e74c3c;
+}
+.tally-total-row {
+  border-top: 2px solid #5c3a21;
+  border-bottom: none;
+  font-size: 17px;
+  margin-top: 4px;
+}
+.tally-total {
+  color: #5c3a21;
+  font-size: 18px;
+}
+.tally-session-row {
+  font-size: 13px;
+  color: #7a5c3a;
+  border-bottom: none;
+}
+.tally-upgrades {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tally-upgrades-title {
+  font-weight: bold;
+  color: #5c3a21;
+  font-size: 14px;
+}
 .upgrade-btn {
-    padding: 10px 16px; border-radius: 8px; cursor: pointer;
-    font-weight: bold; font-size: 14px; border: 2px solid #5c3a21;
-    background: #fff3e0; transition: all 0.2s; display: flex;
-    flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #5c3a21;
+  background: #fff3e0;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
-.upgrade-btn:hover:not(:disabled) { background: #ffe0b2; }
-.upgrade-btn small { font-weight: normal; font-size: 11px; color: #7a5c3a; }
-.upgrade-btn-disabled { opacity: 0.5; cursor: not-allowed; }
-.upgrade-hint { font-size: 12px; color: #e74c3c; }
-.upgrade-owned { font-size: 13px; color: #27ae60; padding: 8px; background: #eafaf1; border-radius: 6px; }
-
-/* Tally action buttons */
-.tally-actions { display: flex; justify-content: center; gap: 16px; margin-top: 8px; }
+.upgrade-btn:hover:not(:disabled) {
+  background: #ffe0b2;
+}
+.upgrade-btn small {
+  font-weight: normal;
+  font-size: 11px;
+  color: #7a5c3a;
+}
+.upgrade-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.upgrade-hint {
+  font-size: 12px;
+  color: #e74c3c;
+}
+.upgrade-owned {
+  font-size: 13px;
+  color: #27ae60;
+  padding: 8px;
+  background: #eafaf1;
+  border-radius: 6px;
+}
+.tally-gate {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+.gate-met {
+  background: #eafaf1;
+  color: #1e8449;
+  border: 1px solid #2ecc71;
+}
+.gate-unmet {
+  background: #fdedec;
+  color: #c0392b;
+  border: 1px solid #e74c3c;
+}
+.tally-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}
 .tally-btn {
-    padding: 12px 28px; font-size: 15px; font-weight: bold;
-    border-radius: 10px; cursor: pointer; border: 2px solid #5c3a21; transition: all 0.2s;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid #5c3a21;
+  transition: all 0.2s;
 }
-.tally-btn-primary   { background: #27ae60; color: white; }
-.tally-btn-primary:hover  { background: #1e8449; }
-.tally-btn-secondary { background: #ecf0f1; color: #5c3a21; }
-.tally-btn-secondary:hover { background: #d5d8dc; }
+.tally-btn-primary {
+  background: #27ae60;
+  color: white;
+}
+.tally-btn-primary:hover {
+  background: #1e8449;
+}
+.tally-btn-secondary {
+  background: #ecf0f1;
+  color: #5c3a21;
+}
+.tally-btn-secondary:hover {
+  background: #d5d8dc;
+}
+.tally-btn-locked {
+  background: #bdc3c7;
+  color: #7f8c8d;
+  cursor: not-allowed;
+  border-color: #bdc3c7;
+  opacity: 0.7;
+}
 
 /* ── Toast ── */
-.toast { position: absolute; pointer-events: none; white-space: nowrap; z-index: 1000; }
+.toast {
+  position: absolute;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1000;
+}

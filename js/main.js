@@ -6,12 +6,14 @@ import { MoodSystem }    from './systems/MoodSystem.js';
 import { BoosterSystem } from './systems/BoosterSystem.js';
 import { FloorScene }    from './scenes/FloorScene.js';
 import { PlatingScene }  from './scenes/PlatingScene.js';
+import { LaphingScene }  from './scenes/LaphingScene.js';
+import { NoodlesScene }  from './scenes/NoodlesScene.js';
 import { TallyScreen }   from './ui/TallyScreen.js';
-import { LEVEL_1, LEVEL_2, LEVEL_3 } from './data/levels.js';
+import { LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4 } from './data/levels.js';
 
 console.log('Game Booted');
 
-const LEVELS = [LEVEL_1, LEVEL_2, LEVEL_3];
+const LEVELS = [LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4];
 
 // Session state — persists across levels within one browser session
 const sessionState = {
@@ -53,7 +55,11 @@ function startLevel(levelIndex) {
 
     const floorScene   = new FloorScene(clock, dragManager, levelConfig, systems);
     const platingScene = new PlatingScene(clock, dragManager, floorScene, boosterSystem);
+    const laphingScene = new LaphingScene(clock, dragManager);
+    const noodlesScene = new NoodlesScene(clock, dragManager, floorScene);
     floorScene.setPlatingScene(platingScene);
+    floorScene.setLaphingScene(laphingScene);
+    floorScene.setNoodlesScene(noodlesScene);
 
     gameContainer.style.display = '';
     gameContainer.innerHTML = '';
@@ -112,6 +118,12 @@ function showGameComplete() {
         startLevel(0);
     });
 }
+
+// ── DEV: press 1–4 to jump to any level instantly ──
+document.addEventListener('keydown', (e) => {
+    const idx = parseInt(e.key) - 1;
+    if (idx >= 0 && idx < LEVELS.length) startLevel(idx);
+});
 
 // Boot
 startLevel(0);

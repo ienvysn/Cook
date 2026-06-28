@@ -2,17 +2,17 @@ import { Order } from './Order.js';
 import { ITEM_REGISTRY, TOPPING_REGISTRY, renderIcon } from '../data/items.js';
 
 export class Customer {
+    // Display width of one sprite frame in the customer card
+    static FRAME_W = 140;
+
     constructor(id, typeConfig) {
         this.id = id;
         this.typeConfig = typeConfig;
-        
+
         const orderType = typeConfig.possibleOrders[Math.floor(Math.random() * typeConfig.possibleOrders.length)];
-        
-        // Randomly decide requested toppings
+
         const validToppings = ITEM_REGISTRY[orderType].validToppings || [];
         const requestedToppings = [];
-        
-        // 80% chance to want toppings. Otherwise, pick 1 to max valid toppings.
         if (Math.random() > 0.2 && validToppings.length > 0) {
             const numToppings = Math.floor(Math.random() * validToppings.length) + 1;
             const shuffled = [...validToppings].sort(() => 0.5 - Math.random());
@@ -20,11 +20,15 @@ export class Customer {
         }
 
         this.order = new Order(orderType, 1, requestedToppings);
-        
         this.maxPatienceMs = typeConfig.basePatienceMs;
-        this.patienceMs = this.maxPatienceMs;
-        
-        this.element = null;
+        this.patienceMs    = this.maxPatienceMs;
+        this.element       = null;
+
+        // Pick a random sprite from the type's sprite list
+        const sprites = typeConfig.sprites || [];
+        this.sprite       = sprites[Math.floor(Math.random() * sprites.length)] || null;
+        this.spriteFrames = typeConfig.spriteFrames || 1;
+        this._lastFrame   = -1; // track last frame to avoid unnecessary DOM writes
     }
 
     render(dragManager, onServe) {
@@ -32,26 +36,53 @@ export class Customer {
         div.className = 'customer dropzone';
         div.id = this.id;
         
-        const baseItemHtml = renderIcon(ITEM_REGISTRY[this.order.baseType]);
-        let toppingsHtml = '';
-        if (this.order.requestedToppings.length > 0) {
-            toppingsHtml = `<div style="display: flex; gap: 5px; justify-content: center; margin-top: -5px;">`;
-            this.order.requestedToppings.forEach(tId => {
-                const html = renderIcon(TOPPING_REGISTRY[tId]);
-                toppingsHtml += `<div style="transform: scale(0.35); margin: -15px;">${html}</div>`;
-            });
-            toppingsHtml += `</div>`;
+        // Show the final plated image (not raw hotbar icon) in the order bubble
+        const item = ITEM_REGISTRY[this.order.baseType];
+        let orderIconHtml;
+        if (item.verticalSprite && item.sprite) {
+            // 1×2 stacked sprite (e.g. laphingbowl): crop to top frame only
+            orderIconHtml = `<div style="width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;
+                                         background:url('${item.sprite}') 0% 0% / 100% 200% no-repeat;"></div>`;
+        } else {
+            const src = item.platedIcon || item.sprite;
+            orderIconHtml = src
+                ? `<img src="${src}" draggable="false"
+                        style="width:38px;height:38px;object-fit:contain;flex-shrink:0;" />`
+                : renderIcon(item);
         }
 
+        // Each requested topping shows as  + emoji  to the right of the main icon
+        let toppingPills = '';
+        this.order.requestedToppings.forEach(tId => {
+            const topping = TOPPING_REGISTRY[tId];
+            if (!topping) return;
+            const emoji = topping.placeholder?.emoji || '❓';
+            toppingPills += `
+                <span style="font-size:9px;font-weight:900;color:#c0392b;line-height:1;">+</span>
+                <span style="font-size:16px;line-height:1;">${emoji}</span>
+            `;
+        });
+
+        const fw = Customer.FRAME_W;
+        const avatarHtml = this.sprite
+            ? `<div class="customer-sprite-frame" style="
+                   width:${fw}px;height:${fw}px;overflow:hidden;border-radius:8px;margin:0 auto 6px;
+                   background-image:url('${this.sprite}');
+                   background-size:200% 200%;
+                   background-position:0% 0%;
+                   background-repeat:no-repeat;
+               "></div>`
+            : `<div class="customer-avatar" style="background:${this.typeConfig.color}">${this.typeConfig.emoji || '👤'}</div>`;
+
         div.innerHTML = `
-            <div class="customer-avatar" style="background:${this.typeConfig.color}">${this.typeConfig.emoji}</div>
-            <div class="customer-order-bubble" style="display: flex; flex-direction: column; align-items: center;">
-                <div style="transform: scale(0.6); margin: -10px;">${baseItemHtml}</div>
-                ${toppingsHtml}
+            <div class="customer-order-bubble" style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:center;padding:4px 6px;">
+                ${orderIconHtml}
+                ${toppingPills}
             </div>
-            <div class="patience-bar-container">
-                <div class="patience-bar" style="width: 100%"></div>
+            <div class="patience-bar-container" style="margin-bottom:4px;">
+                <div class="patience-bar" style="width:100%"></div>
             </div>
+            ${avatarHtml}
         `;
         this.element = div;
 
@@ -79,20 +110,32 @@ export class Customer {
         if (this.patienceMs < 0) this.patienceMs = 0;
 
         if (this.element) {
+            const pct = this.patienceMs / this.maxPatienceMs;
+
+            // Patience bar
             const bar = this.element.querySelector('.patience-bar');
             if (bar) {
-                const percentage = (this.patienceMs / this.maxPatienceMs) * 100;
-                bar.style.width = `${percentage}%`;
-                
-                // Color change based on patience
-                if (percentage < 30) {
-                    bar.style.background = '#e74c3c';
-                } else if (percentage < 60) {
-                    bar.style.background = '#f39c12';
+                bar.style.width = `${pct * 100}%`;
+                if (pct < 0.30)      bar.style.background = '#e74c3c';
+                else if (pct < 0.60) bar.style.background = '#f39c12';
+            }
+
+            // 2x2 sprite grid: frame advances as patience drops
+            // 0=happy(TL), 1=sad(TR), 2=worried(BL), 3=angry(BR)
+            if (this.sprite && this.spriteFrames >= 4) {
+                const frame = pct > 0.75 ? 0 : pct > 0.5 ? 1 : pct > 0.25 ? 2 : 3;
+                if (frame !== this._lastFrame) {
+                    const el = this.element.querySelector('.customer-sprite-frame');
+                    if (el) {
+                        const col = frame % 2;
+                        const row = Math.floor(frame / 2);
+                        el.style.backgroundPosition = `${col * 100}% ${row * 100}%`;
+                    }
+                    this._lastFrame = frame;
                 }
             }
         }
 
-        return this.patienceMs <= 0; // Returns true if patience expired
+        return this.patienceMs <= 0;
     }
 }

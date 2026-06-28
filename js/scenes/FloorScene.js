@@ -40,13 +40,23 @@ export class FloorScene {
         this.timeElapsedMs = 0;
         this.levelEnded    = false;
 
-        this.container   = null;
-        this.clockSub    = null;
+        this.container    = null;
+        this.clockSub     = null;
         this.platingScene = null;
+        this.laphingScene = null;
+        this.noodlesScene = null;
     }
 
     setPlatingScene(platingScene) {
         this.platingScene = platingScene;
+    }
+
+    setLaphingScene(laphingScene) {
+        this.laphingScene = laphingScene;
+    }
+
+    setNoodlesScene(noodlesScene) {
+        this.noodlesScene = noodlesScene;
     }
 
     render(container) {
@@ -77,7 +87,9 @@ export class FloorScene {
                 </div>
             </div>
             <div id="floor-area">
-                <div id="customers-area"></div>
+                <div id="customers-area">
+                    <div id="dustbin-area"></div>
+                </div>
                 <div id="stations-area"></div>
                 <div id="hotbar-area"></div>
             </div>
@@ -86,11 +98,11 @@ export class FloorScene {
         // Wire booster buttons
         this.container.querySelectorAll('.booster-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-booster');
-                if (this.boosterSystem) {
-                    const ok = this.boosterSystem.activate(id);
-                    if (!ok) btn.classList.add('booster-cant-afford');
-                }
+                const id       = btn.getAttribute('data-booster');
+                const unlocked = this.levelConfig.availableBoosters || [];
+                if (!unlocked.includes(id) || !this.boosterSystem) return;
+                this.boosterSystem.activate(id);
+                this._updateBoosterButtons();
             });
         });
 
@@ -136,8 +148,11 @@ export class FloorScene {
             );
         }
 
-        // Render Hotbar
-        const hotbarEl = this.hotbar.render(this.dragManager);
+        // Render Hotbar — only show ingredients the current level's stations accept
+        const levelIngredients = new Set(
+            this.levelConfig.stations.flatMap(s => s.accepts)
+        );
+        const hotbarEl = this.hotbar.render(this.dragManager, levelIngredients);
         this.container.querySelector('#hotbar-area').appendChild(hotbarEl);
 
         // Render Stations
@@ -145,6 +160,10 @@ export class FloorScene {
             const station = new Station(stConfig, this.gameClock);
             station.boosterSystem = this.boosterSystem;
             station.upgrades      = this.upgrades;
+            // Laphing-tray skips cooking and opens the mini-game popup directly
+            if (stConfig.type === 'laphing-tray' && this.laphingScene) {
+                station.onInstantOpen = () => this.laphingScene.open();
+            }
             this.stations.push(station);
             this.container.querySelector('#stations-area').appendChild(station.render(this.dragManager));
         });
@@ -165,7 +184,8 @@ export class FloorScene {
             scene: 'floor',
             accepts: [],
             onReceive: (itemType, draggableEl) => {
-                if (itemType.startsWith('raw-')) {
+                if (itemType.startsWith('raw-') || itemType.startsWith('burnt-')) {
+                    // Reject raw ingredients and burnt items
                     if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
                     return;
                 }
@@ -176,13 +196,57 @@ export class FloorScene {
                 }
                 const sourceStationId  = draggableEl.getAttribute('data-source-station');
                 const sourceSlotIndex  = draggableEl.getAttribute('data-source-slot');
+                // Noodles get their own step-by-step plating mini-game
+                if (itemType === 'noodles' && this.noodlesScene) {
+                    this.noodlesScene.open(sourceStationId, sourceSlotIndex);
+                    return;
+                }
                 if (this.platingScene) {
                     this.platingScene.open(itemType, sourceStationId, sourceSlotIndex, draggableEl);
                 }
             }
         });
 
-        this.nextSpawnTime = 2000;
+        // Render Dustbin
+        const dustbinEl = document.createElement('div');
+        dustbinEl.className = 'station dustbin';
+        dustbinEl.id = 'dustbin-dropzone';
+        dustbinEl.innerHTML = `
+            <div style="font-size: 16px; color: #5c3a21; font-weight: bold; margin-bottom: 5px;">Dustbin</div>
+            <div id="dustbin-items" style="width: 100px; height: 90px; border: 4px dashed #7f8c8d; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: #95a5a6; padding: 10px; font-size: 30px; margin-left: 20px;">
+                🗑️
+            </div>
+        `;
+        this.container.querySelector('#dustbin-area').appendChild(dustbinEl);
+
+        this.dragManager.registerZone('dustbin-dropzone', dustbinEl, {
+            scene: 'floor',
+            accepts: [],
+            onReceive: (itemType, draggableEl) => {
+                // Only accept items that came from a cooking station (not hotbar raw- or plating-counter plated-)
+                const sourceStationId = draggableEl.getAttribute('data-source-station');
+                const isFromStation   = sourceStationId && sourceStationId !== 'plating-counter';
+                const isRaw           = itemType.startsWith('raw-');
+                const isPlated        = itemType.startsWith('plated-');
+
+                if (isRaw || isPlated || !isFromStation) {
+                    if (draggableEl) draggableEl.setAttribute('data-drop-valid', 'false');
+                    return;
+                }
+
+                const sourceSlotIndex = draggableEl.getAttribute('data-source-slot');
+                const station = this.stations.find(s => s.id === sourceStationId);
+                if (station) {
+                    station.clearSlot(parseInt(sourceSlotIndex));
+                }
+
+                // Remove the dragged element so it doesn't snap back and linger
+                if (draggableEl?.parentNode) draggableEl.parentNode.removeChild(draggableEl);
+            }
+        });
+
+        // Set initial spawn time
+        this.nextSpawnTime = 2000; // First customer in 2 seconds
         this.clockSub = this.gameClock.subscribe((delta) => this.tick(delta));
         this._updateBoosterButtons();
     }
@@ -227,9 +291,19 @@ export class FloorScene {
     spawnCustomer() {
         if (this.customers.length + this.telegraphedCustomers.length >= 4) return;
 
-        const typeId  = this.levelConfig.customerTypes[Math.floor(Math.random() * this.levelConfig.customerTypes.length)];
-        const config  = CUSTOMER_TYPES[typeId];
-        const customer = new Customer(`customer-${Date.now()}`, config);
+        const typeId = this.levelConfig.customerTypes[Math.floor(Math.random() * this.levelConfig.customerTypes.length)];
+        const config = CUSTOMER_TYPES[typeId];
+
+        // Only let customers order food that this level's stations can actually produce
+        const availableFoodTypes = this.levelConfig.stations.map(s =>
+            s.produces || s.accepts[0].replace('raw-', '')
+        );
+        const filteredOrders = config.possibleOrders.filter(o => availableFoodTypes.includes(o));
+        const levelConfig = filteredOrders.length > 0
+            ? { ...config, possibleOrders: filteredOrders }
+            : config;
+
+        const customer = new Customer(`customer-${Date.now()}`, levelConfig);
 
         if (config.telegraphMs) {
             const telegraphEl = document.createElement('div');
@@ -333,20 +407,68 @@ export class FloorScene {
         if (this.levelEnded) return;
         this.levelEnded = true;
 
-        // Small delay so last toast is visible
+        const tallyDelay = reason === 'goal' ? 2400 : 900;
+
+        if (reason === 'goal') this._spawnConfetti();
+
         setTimeout(() => {
             if (this.onLevelEnd) {
                 this.onLevelEnd({
-                    levelName:  this.levelConfig.name,
-                    score:      this.score,
-                    revenue:    this.money - this.tips,
-                    tips:       this.tips,
-                    expenses:   this.boosterSpend,
+                    levelName:   this.levelConfig.name,
+                    score:       this.score,
+                    revenue:     this.money - this.tips,
+                    tips:        this.tips,
+                    expenses:    this.boosterSpend,
                     levelConfig: this.levelConfig,
                     reason
                 });
             }
-        }, 800);
+        }, tallyDelay);
+    }
+
+    _spawnConfetti() {
+        const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#f1c40f'];
+
+        const overlay = document.createElement('div');
+        overlay.id = 'confetti-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;overflow:hidden;z-index:3000;';
+
+        for (let i = 0; i < 90; i++) {
+            const p = document.createElement('div');
+            const color    = colors[Math.floor(Math.random() * colors.length)];
+            const size     = 7 + Math.random() * 10;
+            const left     = Math.random() * 100;
+            const delay    = Math.random() * 1.2;
+            const duration = 1.8 + Math.random() * 1.4;
+            const isCircle = Math.random() > 0.5;
+            p.style.cssText = `
+                position:absolute;width:${size}px;height:${size}px;
+                background:${color};border-radius:${isCircle ? '50%' : '2px'};
+                left:${left}%;top:-20px;
+                animation:confettiFall ${duration}s ${delay}s ease-in forwards;
+            `;
+            overlay.appendChild(p);
+        }
+
+        // "Level Complete!" banner
+        const banner = document.createElement('div');
+        banner.style.cssText = `
+            position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);
+            font-size:2.8rem;font-weight:900;color:#fff;
+            text-shadow:0 4px 14px rgba(0,0,0,0.55);
+            animation:levelCompleteBanner 0.45s cubic-bezier(.17,.67,.47,1.3) forwards;
+            z-index:3001;pointer-events:none;text-align:center;white-space:nowrap;
+        `;
+        banner.textContent = '🎉 Level Complete! 🎉';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(banner);
+
+        // Clean up before tally screen appears
+        setTimeout(() => {
+            overlay.remove();
+            banner.remove();
+        }, 2200);
     }
 
     updateHUD() {
@@ -354,21 +476,37 @@ export class FloorScene {
         this.container.querySelector('#hud-score').textContent  = this.score;
         this.container.querySelector('#hud-money').textContent  = this.money;
         this.container.querySelector('#hud-served').textContent = this.servedCount;
+        // Refresh booster affordability every time money changes
+        this._updateBoosterButtons();
     }
 
     _updateBoosterButtons() {
         if (!this.container || !this.boosterSystem) return;
+        const unlocked = this.levelConfig.availableBoosters || [];
+
         Object.values(BOOSTER_DEFS).forEach(def => {
             const btn = this.container.querySelector(`#booster-btn-${def.id}`);
             if (!btn) return;
 
-            const active     = this.boosterSystem.isActive(def.id);
-            const canAfford  = this.money >= def.cost;
-            const remainMs   = this.boosterSystem.getRemainingMs(def.id);
+            const isLocked = !unlocked.includes(def.id);
+
+            if (isLocked) {
+                btn.disabled = true;
+                btn.className = 'booster-btn booster-locked';
+                btn.innerHTML = `🔒 ${def.label}<br><small>Next level</small>`;
+                return;
+            }
+
+            const active    = this.boosterSystem.isActive(def.id);
+            const canAfford = this.money >= def.cost;
+            const remainMs  = this.boosterSystem.getRemainingMs(def.id);
 
             btn.disabled = active || !canAfford;
-            btn.classList.toggle('booster-active',       active);
-            btn.classList.toggle('booster-cant-afford',  !canAfford && !active);
+            btn.className = [
+                'booster-btn',
+                active      ? 'booster-active'      : '',
+                !canAfford && !active ? 'booster-cant-afford' : ''
+            ].join(' ').trim();
 
             if (active && def.durationMs) {
                 const secs = Math.ceil(remainMs / 1000);

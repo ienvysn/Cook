@@ -1,7 +1,7 @@
 export class DragManager {
     constructor() {
         this.zones = new Map();
-        this.currentScene = 'floor'; // Default scene
+        this.currentScene = 'floor';
     }
 
     setScene(sceneName) {
@@ -13,78 +13,82 @@ export class DragManager {
 
         interact(element).dropzone({
             accept: '.draggable',
-            overlap: 'center', // 'center' ensures if the middle of the item is over the zone, it drops
+            overlap: 'center',
             ondrop: (event) => {
-                const draggableEl = event.relatedTarget;
-                const dropzoneId = element.id || 'unknown-dropzone';
-                console.log(`[Dropzone ${dropzoneId}] ondrop triggered by:`, draggableEl);
+                const draggableEl   = event.relatedTarget;
                 const draggedItemType = draggableEl.getAttribute('data-item-type');
-                const draggedScene = draggableEl.getAttribute('data-scene');
-                
-                // Scene scope check
-                if (this.currentScene !== scene || draggedScene !== scene) {
-                    return;
-                }
+                const draggedScene    = draggableEl.getAttribute('data-scene');
 
-                console.log(`[Dropzone ${dropzoneId}] Item dropped: ${draggedItemType}, accepts:`, accepts);
-                
-                // Match check
-                // If accepts is empty, it accepts anything. If populated, it must include the type.
-                if (accepts.length > 0 && !accepts.includes(draggedItemType)) {
-                    console.log(`[Dropzone ${dropzoneId}] Rejected item type: ${draggedItemType}`);
-                    return;
-                }
+                if (this.currentScene !== scene || draggedScene !== scene) return;
 
-                console.log(`[Dropzone ${dropzoneId}] Valid drop accepted!`);
-                // Mark valid drop
+                if (accepts.length > 0 && !accepts.includes(draggedItemType)) return;
+
                 draggableEl.setAttribute('data-drop-valid', 'true');
-                if (onReceive) {
-                    onReceive(draggedItemType, draggableEl);
-                }
+                if (onReceive) onReceive(draggedItemType, draggableEl);
             }
         });
     }
 
-    registerDraggable(element, { itemType, scene }) {
+    // dragPreviewSrc — optional URL; when provided a food-image ghost tracks the cursor
+    registerDraggable(element, { itemType, scene, dragPreviewSrc = null }) {
         element.classList.add('draggable');
         element.setAttribute('data-item-type', itemType);
         element.setAttribute('data-scene', scene);
 
         let placeholder = null;
+        let ghost       = null;
 
         interact(element).draggable({
             listeners: {
                 start: (event) => {
-                    console.log(`[Draggable ${itemType}] Drag started`, event.target);
-                    if (scene !== this.currentScene) {
-                        console.log(`[Draggable ${itemType}] Scene mismatch, ignoring`);
-                        return;
-                    }
+                    if (scene !== this.currentScene) return;
 
-                    // Create placeholder so it looks infinite, but attach to body so layout doesn't shift
+                    // Semi-transparent placeholder so the source slot looks occupied
                     const startRect = element.getBoundingClientRect();
                     placeholder = element.cloneNode(true);
-                    placeholder.style.position = 'absolute';
-                    placeholder.style.top = `${startRect.top}px`;
-                    placeholder.style.left = `${startRect.left}px`;
-                    placeholder.style.width = `${startRect.width}px`;
-                    placeholder.style.height = `${startRect.height}px`;
-                    placeholder.style.margin = '0';
-                    placeholder.style.opacity = '0.5';
-                    placeholder.style.zIndex = '1';
-                    placeholder.style.pointerEvents = 'none';
+                    placeholder.style.cssText += `
+                        position:absolute;
+                        top:${startRect.top + window.scrollY}px;
+                        left:${startRect.left + window.scrollX}px;
+                        width:${startRect.width}px;
+                        height:${startRect.height}px;
+                        margin:0;opacity:0.4;z-index:1;pointer-events:none;
+                    `;
                     document.body.appendChild(placeholder);
 
-                    // Ensure element is above others while dragging and doesn't block pointer events for dropzones
-                    element.style.position = 'relative';
-                    element.style.zIndex = '9999';
+                    element.style.position    = 'relative';
+                    element.style.zIndex      = '9999';
                     element.style.pointerEvents = 'none';
 
-                    // Reset drag state
                     event.target.setAttribute('data-drag-x', 0);
                     event.target.setAttribute('data-drag-y', 0);
                     event.target.setAttribute('data-drop-valid', 'false');
+
+                    // Food-image ghost that follows the cursor
+                    if (dragPreviewSrc) {
+                        element.style.opacity = '0'; // hide the real element
+
+                        ghost = document.createElement('div');
+                        ghost.style.cssText = `
+                            position:fixed;
+                            width:76px;height:76px;
+                            border-radius:50%;
+                            background:#fff;
+                            border:3px solid rgba(255,255,255,0.9);
+                            box-shadow:0 6px 20px rgba(0,0,0,0.45);
+                            overflow:hidden;
+                            pointer-events:none;
+                            z-index:99999;
+                            left:${event.clientX}px;
+                            top:${event.clientY}px;
+                            transform:translate(-50%,-55%) scale(1.08);
+                        `;
+                        ghost.innerHTML = `<img src="${dragPreviewSrc}" draggable="false"
+                            style="width:100%;height:100%;object-fit:contain;display:block;" />`;
+                        document.body.appendChild(ghost);
+                    }
                 },
+
                 move: (event) => {
                     if (!placeholder || scene !== this.currentScene) return;
 
@@ -92,45 +96,46 @@ export class DragManager {
                     const y = (parseFloat(event.target.getAttribute('data-drag-y')) || 0) + event.dy;
 
                     event.target.style.transform = `translate(${x}px, ${y}px)`;
-
                     event.target.setAttribute('data-drag-x', x);
                     event.target.setAttribute('data-drag-y', y);
+
+                    if (ghost) {
+                        ghost.style.left = `${event.clientX}px`;
+                        ghost.style.top  = `${event.clientY}px`;
+                    }
                 },
+
                 end: (event) => {
-                    console.log(`[Draggable] Drag ended`, event.target);
                     if (!placeholder) return;
 
+                    const currentGhost       = ghost;
                     const currentPlaceholder = placeholder;
-                    placeholder = null; // Clear outer scope reference early for next drag
+                    ghost       = null;
+                    placeholder = null;
+
+                    if (currentGhost) currentGhost.remove();
+                    event.target.style.opacity = '';
 
                     const validDrop = event.target.getAttribute('data-drop-valid') === 'true';
-                    console.log(`[Draggable] validDrop result:`, validDrop);
 
                     if (!validDrop) {
-                        // Snap back smoothly
                         event.target.style.transition = 'transform 0.3s ease';
-                        event.target.style.transform = 'translate(0px, 0px)';
-                        
+                        event.target.style.transform  = 'translate(0px, 0px)';
                         setTimeout(() => {
                             if (event.target) {
-                                event.target.style.transition = '';
-                                event.target.style.zIndex = '';
-                                event.target.style.position = '';
+                                event.target.style.transition    = '';
+                                event.target.style.zIndex        = '';
+                                event.target.style.position      = '';
                                 event.target.style.pointerEvents = '';
                             }
-                            if (currentPlaceholder && currentPlaceholder.parentNode) {
-                                currentPlaceholder.parentNode.removeChild(currentPlaceholder);
-                            }
+                            currentPlaceholder?.parentNode?.removeChild(currentPlaceholder);
                         }, 300);
                     } else {
-                        // Instantly reset for infinite drag sources
-                        event.target.style.transform = 'translate(0px, 0px)';
-                        event.target.style.zIndex = '';
-                        event.target.style.position = '';
+                        event.target.style.transform     = 'translate(0px, 0px)';
+                        event.target.style.zIndex        = '';
+                        event.target.style.position      = '';
                         event.target.style.pointerEvents = '';
-                        if (currentPlaceholder && currentPlaceholder.parentNode) {
-                            currentPlaceholder.parentNode.removeChild(currentPlaceholder);
-                        }
+                        currentPlaceholder?.parentNode?.removeChild(currentPlaceholder);
                     }
                 }
             }

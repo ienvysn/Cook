@@ -1,20 +1,38 @@
-import { ITEM_REGISTRY, renderIcon } from '../data/items.js';
+import { ITEM_REGISTRY } from '../data/items.js';
 import { UPGRADE_FASTER_STEAMER_MULTIPLIER } from '../data/config.js';
+
+// Maps station type → the sprite sheet used for that station's slots.
+// Each sprite sheet has 4 frames horizontally: [empty, cooking, ready, burnt].
+// Laphing uses a 3×2 grid (see CSS for frame positions).
+const STATION_SPRITES = {
+    'steamer':      'assets/icons/images/momo.png',
+    'fry-pan':      'assets/icons/images/finalfryingpan asset.png',
+    'laphing-tray': 'assets/icons/images/laphingsheet.png',
+    'cooking-pot':  'assets/icons/images/keemanoodle.png'
+};
+
+const STATION_LABELS = {
+    'steamer':      'Steamer',
+    'fry-pan':      'Fry Pan',
+    'laphing-tray': 'Laphing',
+    'cooking-pot':  'Noodles'
+};
 
 export class Station {
     constructor(config, gameClock) {
         this.id      = config.id;
         this.type    = config.type;
         this.accepts = config.accepts;
+        this.produces = config.produces || null; // what food type this station outputs
         this.slots   = new Array(config.slots).fill(null);
-        this.gameClock  = gameClock;
-        this.element    = null;
+        this.gameClock   = gameClock;
+        this.element     = null;
         this.dragManager = null;
         this.clockSubscription = null;
 
         // Set by FloorScene after construction
         this.boosterSystem = null;
-        this.upgrades      = null; // { fasterSteamer: bool }
+        this.upgrades      = null;
     }
 
     render(dragManager) {
@@ -23,12 +41,14 @@ export class Station {
         const div = document.createElement('div');
         div.className = `station station-${this.type} dropzone`;
         div.id = this.id;
-        div.innerHTML = `<h3>${this.type.toUpperCase()}</h3><div class="station-slots"></div>`;
+
+        const label = STATION_LABELS[this.type] || this.type;
+        div.innerHTML = `<div class="station-name">${label}</div><div class="station-slots"></div>`;
 
         const slotsContainer = div.querySelector('.station-slots');
         this.slots.forEach((_, index) => {
             const slotEl = document.createElement('div');
-            slotEl.className = 'station-slot';
+            slotEl.className = 'station-slot state-empty';
             slotEl.id = `${this.id}-slot-${index}`;
             slotsContainer.appendChild(slotEl);
         });
@@ -37,6 +57,12 @@ export class Station {
             scene: 'floor',
             accepts: this.accepts,
             onReceive: (draggedItemType, draggableEl) => {
+                // Laphing-tray (and any station with onInstantOpen set) skips the cook timer
+                // and hands off directly to a mini-game popup.
+                if (this.onInstantOpen) {
+                    this.onInstantOpen(draggedItemType, draggableEl);
+                    return;
+                }
                 const availableIndex = this.slots.findIndex(slot => slot === null);
                 if (availableIndex !== -1) {
                     this.receiveItem(availableIndex, draggedItemType);
@@ -54,8 +80,10 @@ export class Station {
     receiveItem(index, rawIngredient) {
         if (this.slots[index] !== null) return;
 
-        const baseType  = rawIngredient.replace('raw-', '');
+        // Use the station's declared output type, or fall back to stripping 'raw-'
+        const baseType   = this.produces || rawIngredient.replace('raw-', '');
         const itemConfig = ITEM_REGISTRY[baseType];
+        if (!itemConfig) return;
 
         const upgradeMultiplier = this.upgrades?.fasterSteamer
             ? UPGRADE_FASTER_STEAMER_MULTIPLIER
@@ -73,14 +101,14 @@ export class Station {
     }
 
     tick(delta) {
-        // Speed booster makes progress accumulate faster (cook time feels shorter)
         const speedFactor = this.boosterSystem ? this.boosterSystem.getCookSpeedFactor() : 1.0;
 
         this.slots.forEach((slot, index) => {
             if (slot && slot.state === 'cooking') {
                 slot.progress += delta * speedFactor;
 
-                const slotEl = this.element.querySelector(`#${this.id}-slot-${index}`);
+                // Smooth progress bar update (targeted, no full re-render)
+                const slotEl = this.element?.querySelector(`#${this.id}-slot-${index}`);
                 if (slotEl) {
                     const pb = slotEl.querySelector('.cook-progress');
                     if (pb) pb.style.width = `${Math.min((slot.progress / slot.maxTime) * 100, 100)}%`;
@@ -89,6 +117,14 @@ export class Station {
                 if (slot.progress >= slot.maxTime) {
                     slot.state = 'ready';
                     slot.progress = slot.maxTime;
+                    slot.burnProgress = 0;
+                    slot.burnTime = slot.maxTime * 1.5;
+                    slot.uiNeedsUpdate = true;
+                }
+            } else if (slot && slot.state === 'ready') {
+                slot.burnProgress += delta;
+                if (slot.burnProgress >= slot.burnTime) {
+                    slot.state = 'burnt';
                     slot.uiNeedsUpdate = true;
                 }
             }
@@ -101,30 +137,43 @@ export class Station {
     }
 
     updateSlotUI(index) {
-        const slotEl = this.element.querySelector(`#${this.id}-slot-${index}`);
+        const slotEl = this.element?.querySelector(`#${this.id}-slot-${index}`);
         if (!slotEl) return;
 
         const slot = this.slots[index];
-        slotEl.innerHTML = '';
-        if (!slot) return;
 
-        const config = ITEM_REGISTRY[slot.baseType];
+        // Update the state class — CSS background-position rules pick the right sprite frame
+        slotEl.className = `station-slot state-${slot ? slot.state : 'empty'}`;
+        slotEl.innerHTML = '';
+
+        if (!slot) return;
 
         if (slot.state === 'cooking') {
             slotEl.innerHTML = `
-                ${renderIcon(config)}
-                <div class="cook-progress-bar"><div class="cook-progress" style="width: ${(slot.progress / slot.maxTime) * 100}%"></div></div>
-            `;
-        } else if (slot.state === 'ready') {
-            slotEl.innerHTML = `
-                <div class="ready-item" id="${this.id}-ready-${index}">
-                    ${renderIcon(config)}
+                <div class="cook-progress-bar">
+                    <div class="cook-progress" style="width:${(slot.progress / slot.maxTime) * 100}%"></div>
                 </div>
             `;
-            const readyItemEl = slotEl.querySelector('.ready-item');
-            this.dragManager.registerDraggable(readyItemEl, { itemType: slot.baseType, scene: 'floor' });
-            readyItemEl.setAttribute('data-source-station', this.id);
-            readyItemEl.setAttribute('data-source-slot', index);
+        } else if (slot.state === 'ready') {
+            const handle = document.createElement('div');
+            handle.className = 'ready-item slot-handle';
+            handle.id = `${this.id}-ready-${index}`;
+            handle.setAttribute('data-source-station', this.id);
+            handle.setAttribute('data-source-slot', String(index));
+            slotEl.appendChild(handle);
+            const previewSrc = ITEM_REGISTRY[slot.baseType]?.platedIcon || ITEM_REGISTRY[slot.baseType]?.sprite;
+            this.dragManager.registerDraggable(handle, { itemType: slot.baseType, scene: 'floor', dragPreviewSrc: previewSrc });
+        } else if (slot.state === 'burnt') {
+            const handle = document.createElement('div');
+            handle.className = 'burnt-item slot-handle';
+            handle.id = `${this.id}-burnt-${index}`;
+            handle.setAttribute('data-source-station', this.id);
+            handle.setAttribute('data-source-slot', String(index));
+            slotEl.appendChild(handle);
+            this.dragManager.registerDraggable(handle, {
+                itemType: `burnt-${slot.baseType}`,
+                scene: 'floor'
+            });
         }
     }
 
