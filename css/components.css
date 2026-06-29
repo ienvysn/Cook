@@ -327,13 +327,39 @@
   align-self: stretch;
 }
 
-/* ── Dustbin — outside the counter, inside #dustbin-area absolute div ── */
-.station.dustbin {
-  background: rgba(40, 20, 5, 0.8);
-  backdrop-filter: blur(6px);
-  border: 2px dashed #a0956a;
-  border-radius: 12px;
-  padding: 8px 10px;
+/* ── Dustbin Slot (on the right bar) ── */
+.dustbin-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 2px dashed #c8a96e;
+  background: rgba(255, 248, 220, 0.05);
+  padding: 10px;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  width: 54px;
+}
+
+.dustbin-slot:hover, .dustbin-slot.drag-over {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(220, 50, 50, 0.5);
+  background: rgba(255, 50, 50, 0.15);
+  border-color: #ff8c8c;
+}
+
+.dustbin-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8c87a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.dustbin-icon {
+  font-size: 32px;
 }
 
 /* ── HUD ── */

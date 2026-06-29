@@ -30,62 +30,72 @@ body::before {
     flex-direction: column;
     height: 100vh;
     min-height: 600px;
+    position: relative;
 }
 
 /* ── Customer zone: fills vertical space above counter ── */
 #customers-area {
     flex: 1;
-    position: relative;            /* anchor for #dustbin-area absolute positioning */
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-end;         /* customers stand at the counter edge */
     gap: 18px;
-    padding: 72px 160px 20px 40px; /* right pad keeps customers away from the dustbin */
+    padding: 72px 40px 20px 40px;
     min-height: 160px;
     overflow: visible;
 }
 
-/* ── Dustbin: floats above the counter at right edge, outside counter ── */
-#dustbin-area {
-    position: absolute;
-    bottom: 6px;
-    right: 18px;
-    z-index: 10;
+#counter-row {
+    display: flex;
+    height: 40%;
+    width: 100%;
+    z-index: 2;
 }
 
-/* ── Wooden counter: cover+bottom crops out top items, shows just wood+teal ──
- *
- * cover scales counter.png to fill 100% of screen width.
- * bottom anchors the image bottom to the container bottom.
- * The top portion (cash register, menu board, bowls) is clipped away —
- * only the dark wooden surface + teal front panel remains visible.
- * ── */
+/* ── Wooden counter: cover+bottom crops out top items, shows just wood+teal ── */
 #stations-area {
     display: flex;
     padding: 0 30px;
     align-items: flex-start;
-    width: 120%;
-    height: 50%;
+    flex: 1;
+    height: 100%;
     background: url('../assets/icons/images/table.jpg') bottom left / 60% 120% repeat-x;
     border-top: 3px solid #111;
     overflow: hidden;
     position: relative;
-    z-index: 2;
 }
 
-/* ── Ingredient hotbar: vertical strip on the left of the counter ── */
 #hotbar-area {
     background: rgba(20, 8, 0, 0.55);
     border-right: 2px solid #c8a96e;
+    border-top: 3px solid #111;
     padding: 12px 8px;
     display: flex;
-    position: absolute;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(4px);
-    z-index: 6;
-    left: 0;
-    bottom: 50%;
-    top: 2%;
+    width: 86px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+#dustbin-area {
+    background: rgba(20, 8, 0, 0.55);
+    border-left: 2px solid #c8a96e;
+    border-top: 3px solid #111;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    width: 86px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
 }

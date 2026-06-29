@@ -89,10 +89,12 @@ export class FloorScene {
             </div>
             <div id="floor-area">
                 <div id="customers-area">
+                </div>
+                <div id="counter-row">
+                    <div id="hotbar-area"></div>
+                    <div id="stations-area"></div>
                     <div id="dustbin-area"></div>
                 </div>
-                <div id="stations-area"></div>
-                <div id="hotbar-area"></div>
             </div>
         `;
 
@@ -209,15 +211,13 @@ export class FloorScene {
             }
         });
 
-        // Render Dustbin
+        // Render Dustbin as a vertical strip on the right side
         const dustbinEl = document.createElement('div');
-        dustbinEl.className = 'station dustbin';
+        dustbinEl.className = 'dustbin-slot';
         dustbinEl.id = 'dustbin-dropzone';
         dustbinEl.innerHTML = `
-            <div style="font-size: 16px; color: #5c3a21; font-weight: bold; margin-bottom: 5px;">Dustbin</div>
-            <div id="dustbin-items" style="width: 100px; height: 90px; border: 4px dashed #7f8c8d; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: #95a5a6; padding: 10px; font-size: 30px; margin-left: 20px;">
-                🗑️
-            </div>
+            <div class="dustbin-label">WASTE</div>
+            <div class="dustbin-icon">🗑️</div>
         `;
         this.container.querySelector('#dustbin-area').appendChild(dustbinEl);
 

@@ -59,6 +59,7 @@ export class DragManager {
                     element.style.position    = 'relative';
                     element.style.zIndex      = '9999';
                     element.style.pointerEvents = 'none';
+                    element.style.transition  = 'none';
 
                     event.target.setAttribute('data-drag-x', 0);
                     event.target.setAttribute('data-drag-y', 0);
