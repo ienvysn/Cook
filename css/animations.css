@@ -63,3 +63,14 @@
     50%       { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
 }
 .ready-item { animation: readyPulse 1.4s ease-in-out infinite; }
+
+/* Stat Increase Pulse */
+@keyframes statPulseAnim {
+    0%   { transform: scale(1); text-shadow: 0 0 0 transparent; }
+    50%  { transform: scale(1.15); text-shadow: 0 0 12px #f1c40f, 0 0 20px #f39c12; color: #f1c40f; }
+    100% { transform: scale(1); text-shadow: 0 0 0 transparent; }
+}
+
+.stat-pulse {
+    animation: statPulseAnim 0.4s ease-out;
+}

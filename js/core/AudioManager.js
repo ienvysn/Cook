@@ -1,4 +1,4 @@
-/**
+23/**
  * AudioManager — handles all game sound effects.
  *
  * Audio mapping:
@@ -17,7 +17,9 @@ const AUDIO_PATHS = {
     frying:     'assets/audio/frying.wav',
     steam:      'assets/audio/freesound_community-steam-sfx-26907.mp3',
     chop:       'assets/audio/laphingchop.wav',
-    plating:    'assets/audio/puttingstuffon.mp3'
+    plating:    'assets/audio/puttingstuffon.mp3',
+    win:        'assets/audio/winsound.mp3.mp3',
+    loss:       'assets/audio/gameloss.mp3.mp3'
 };
 
 export class AudioManager {
@@ -59,6 +61,10 @@ export class AudioManager {
                 audio.volume = 0.6;
             }
 
+            if (key === 'win' || key === 'loss') {
+                audio.volume = 0.8;
+            }
+
             this._sounds[key] = audio;
         }
     }
@@ -92,6 +98,16 @@ export class AudioManager {
     /** Play the plating / putting-stuff-on sound (one-shot). */
     playPlating() {
         this._oneShot('plating');
+    }
+
+    /** Play the win sound (one-shot). */
+    playWin() {
+        this._oneShot('win');
+    }
+
+    /** Play the loss sound (one-shot). */
+    playLoss() {
+        this._oneShot('loss');
     }
 
     /** Start the laphing chop loop (plays continuously during chopping). */

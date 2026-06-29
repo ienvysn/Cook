@@ -64,22 +64,25 @@ export class FloorScene {
         this.container = container;
         this.container.innerHTML = `
             <div id="hud">
-                <div id="hud-stats">
-                    <div>Score: <span id="hud-score">0</span></div>
-                    <div>Money: Rs. <span id="hud-money">0</span></div>
-                    <div>Served: <span id="hud-served">0</span> / ${this.levelConfig.goal.target}</div>
+                <div id="hud-stats" class="hud-panel">
+                    <div class="stat-row" title="Score"><span class="stat-icon">⭐</span> <span id="hud-score">0</span></div>
+                    <div class="stat-row" title="Money"><span class="stat-icon">💰</span> <span>Rs. <span id="hud-money">0</span></span></div>
+                    <div class="stat-row" title="Served"><span class="stat-icon">🍽️</span> <span><span id="hud-served">0</span> / ${this.levelConfig.goal.target}</span></div>
                 </div>
-                <div id="hud-combo">
-                    <div class="combo-streak" id="combo-streak-display">Streak: 0</div>
-                    <div class="combo-mult" id="combo-mult-display">x1.0</div>
-                </div>
-                <div id="hud-mood">
-                    <span class="mood-label">Vibe</span>
-                    <div class="mood-bar-container">
-                        <div class="mood-bar" id="mood-bar" style="width:60%"></div>
+                
+                <div id="hud-center" class="hud-panel">
+                    <div id="hud-mood">
+                        <span class="mood-label">Vibe</span>
+                        <div class="mood-bar-container">
+                            <div class="mood-bar" id="mood-bar" style="width:60%"></div>
+                        </div>
+                    </div>
+                    <div id="hud-combo">
+                        <div class="combo-mult" id="combo-mult-display">x1.0</div>
                     </div>
                 </div>
-                <div id="hud-boosters">
+
+                <div id="hud-boosters" class="hud-panel">
                     ${Object.values(BOOSTER_DEFS).map(b => `
                         <button class="booster-btn" id="booster-btn-${b.id}" data-booster="${b.id}">
                             ${b.emoji} ${b.label}<br><small>Rs.${b.cost}</small>
@@ -114,7 +117,7 @@ export class FloorScene {
             this.eventBus.on('combo:update', ({ streak, multiplier }) => {
                 const streakEl = this.container.querySelector('#combo-streak-display');
                 const multEl   = this.container.querySelector('#combo-mult-display');
-                if (streakEl) streakEl.textContent = `Streak: ${streak}`;
+                if (streakEl) streakEl.textContent = streak;
                 if (multEl) {
                     multEl.textContent = `x${multiplier.toFixed(1)}`;
                     multEl.className = `combo-mult ${streak >= 15 ? 'combo-ultra' : streak >= 10 ? 'combo-high' : streak >= 5 ? 'combo-mid' : ''}`;
@@ -260,7 +263,9 @@ export class FloorScene {
         // Spawn customers
         if (this.timeElapsedMs >= this.nextSpawnTime) {
             this.spawnCustomer();
-            this.nextSpawnTime = this.timeElapsedMs + (this.levelConfig.spawnIntervalSeconds * 1000);
+            const baseInterval = this.levelConfig.spawnIntervalSeconds * 1000;
+            const randomOffset = (Math.random() * baseInterval * 0.4) - (baseInterval * 0.2);
+            this.nextSpawnTime = this.timeElapsedMs + baseInterval + randomOffset;
         }
 
         // Countdown telegraphed customers
@@ -291,7 +296,7 @@ export class FloorScene {
     }
 
     spawnCustomer() {
-        if (this.customers.length + this.telegraphedCustomers.length >= 4) return;
+        if (this.customers.length + this.telegraphedCustomers.length >= 5) return;
 
         const typeId = this.levelConfig.customerTypes[Math.floor(Math.random() * this.levelConfig.customerTypes.length)];
         const config = CUSTOMER_TYPES[typeId];
@@ -301,11 +306,16 @@ export class FloorScene {
             s.produces || s.accepts[0].replace('raw-', '')
         );
         const filteredOrders = config.possibleOrders.filter(o => availableFoodTypes.includes(o));
-        const levelConfig = filteredOrders.length > 0
-            ? { ...config, possibleOrders: filteredOrders }
-            : config;
+        let basePatienceMs = config.basePatienceMs;
+        if (this.levelConfig.patienceMultiplier) {
+            basePatienceMs *= this.levelConfig.patienceMultiplier;
+        }
 
-        const customer = new Customer(`customer-${Date.now()}`, levelConfig);
+        const levelConfigObj = filteredOrders.length > 0
+            ? { ...config, possibleOrders: filteredOrders, basePatienceMs }
+            : { ...config, basePatienceMs };
+
+        const customer = new Customer(`customer-${Date.now()}`, levelConfigObj);
 
         if (config.telegraphMs) {
             const telegraphEl = document.createElement('div');
@@ -478,9 +488,35 @@ export class FloorScene {
 
     updateHUD() {
         if (!this.container) return;
-        this.container.querySelector('#hud-score').textContent  = this.score;
-        this.container.querySelector('#hud-money').textContent  = this.money;
+        
+        const scoreEl = this.container.querySelector('#hud-score');
+        const moneyEl = this.container.querySelector('#hud-money');
+        
+        const currentScore = parseInt(scoreEl.textContent) || 0;
+        const currentMoney = parseInt(moneyEl.textContent) || 0;
+        
+        scoreEl.textContent  = this.score;
+        moneyEl.textContent  = this.money;
         this.container.querySelector('#hud-served').textContent = this.servedCount;
+        
+        if (this.score > currentScore) {
+            const row = scoreEl.closest('.stat-row');
+            if (row) {
+                row.classList.remove('stat-pulse');
+                void row.offsetWidth; // trigger reflow
+                row.classList.add('stat-pulse');
+            }
+        }
+        
+        if (this.money > currentMoney) {
+            const row = moneyEl.closest('.stat-row');
+            if (row) {
+                row.classList.remove('stat-pulse');
+                void row.offsetWidth;
+                row.classList.add('stat-pulse');
+            }
+        }
+
         // Refresh booster affordability every time money changes
         this._updateBoosterButtons();
     }

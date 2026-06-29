@@ -34,6 +34,11 @@ let dragManager = null;
 
 function startLevel(levelIndex) {
     sessionState.currentLevelIndex = levelIndex;
+    localStorage.setItem('momo_fever_save', JSON.stringify({
+        levelIndex: sessionState.currentLevelIndex,
+        sessionMoney: sessionState.sessionMoney,
+        upgrades: sessionState.upgrades
+    }));
     const levelConfig = LEVELS[levelIndex];
 
     // Clean up any previous DragManager to remove stale interact.js bindings
@@ -79,6 +84,18 @@ function startLevel(levelIndex) {
 function onLevelEnd(stats, { eventBus, boosterSystem }) {
     // Tear down booster GameClock subscription
     boosterSystem.destroy();
+
+    const net = stats.revenue + stats.tips - stats.expenses;
+    const minNet = stats.levelConfig.minNetToProgress || 0;
+    const isLastLevel = stats.levelConfig.id >= 4;
+    const meetsGate = isLastLevel || net >= minNet;
+    const isLoss = stats.reason === 'mood' || !meetsGate;
+
+    if (isLoss) {
+        audioManager.playLoss();
+    } else {
+        audioManager.playWin();
+    }
 
     tallyScreen.show(
         {
@@ -130,4 +147,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Boot
-startLevel(0);
+let savedData = { levelIndex: 0, sessionMoney: 0, upgrades: { fasterSteamer: false } };
+try {
+    const rawData = localStorage.getItem('momo_fever_save');
+    if (rawData) {
+        savedData = JSON.parse(rawData);
+    } else {
+        const oldLevel = parseInt(localStorage.getItem('momo_fever_level'), 10);
+        if (!isNaN(oldLevel)) {
+            savedData.levelIndex = oldLevel;
+        }
+    }
+} catch (e) {
+    console.warn('Failed to parse save data', e);
+}
+
+sessionState.sessionMoney = savedData.sessionMoney || 0;
+sessionState.upgrades = savedData.upgrades || { fasterSteamer: false };
+const initialLevel = Math.min(Math.max(0, savedData.levelIndex || 0), LEVELS.length - 1);
+
+startLevel(initialLevel);
