@@ -240,6 +240,10 @@ export class LaphingScene {
         // Stop any looping chop sound if still playing
         if (this.audioManager) this.audioManager.stopChop();
 
+        this._blocking  = false;
+        this.step       = 0;
+        this.chopCount  = 0;
+        this.hasSauce   = false;
 
         this.confirmBtn.textContent = 'Add to Bowl 🥣';
         this.popupEl.style.display           = 'none';
