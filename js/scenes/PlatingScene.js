@@ -38,7 +38,22 @@ export class PlatingScene {
         });
     }
 
+    open(itemType, sourceStationId, sourceSlotIndex, draggableEl) {
+        this.currentItem            = itemType;
+        this.currentSourceStationId = sourceStationId;
+        this.currentSourceSlotIndex = sourceSlotIndex;
+        this.currentDraggableEl     = draggableEl;
+        this.selectedToppings.clear();
 
+        // Quick Plate booster: skip time-slow for this one popup
+        const skipSlow = this.boosterSystem ? this.boosterSystem.consumeQuickPlate() : false;
+        this.gameClock.setTimeScale(skipSlow ? 1.0 : PLATING_TIME_SCALE);
+        this.dragManager.setScene('plating');
+
+        this.popupEl.style.display = 'flex';
+        this.renderToppingBin();
+        this.renderPlateArea();
+    }
 
     renderToppingBin() {
         this.toppingBin.innerHTML = '';
