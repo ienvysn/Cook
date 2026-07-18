@@ -126,7 +126,7 @@ export class Station {
                     slot.state = 'ready';
                     slot.progress = slot.maxTime;
                     slot.burnProgress = 0;
-                    slot.burnTime = slot.maxTime * 1.5;
+                    slot.burnTime = slot.maxTime * 3.0;
                     slot.uiNeedsUpdate = true;
 
                     // Stop cooking sound if no other slots are still cooking

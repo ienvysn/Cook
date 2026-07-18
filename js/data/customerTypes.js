@@ -3,7 +3,7 @@ export const CUSTOMER_TYPES = {
         id: 'college-student',
         name: 'College Student',
         basePatienceMs: 25000,
-        possibleOrders: ['momo'],
+        possibleOrders: ['momo', 'fried-momo', 'laphing', 'noodles'],
         color: '#3498db',
         sprites: [
             'assets/icons/images/studentboy.png',
@@ -25,7 +25,7 @@ export const CUSTOMER_TYPES = {
         id: 'oli',
         name: 'Oli',
         basePatienceMs: 20000,
-        possibleOrders: ['momo', 'fried-momo'],
+        possibleOrders: ['momo', 'fried-momo', 'laphing', 'noodles'],
         color: '#8e44ad',
         sprites: ['assets/icons/images/olii.png'],
         spriteFrames: 4

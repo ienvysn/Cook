@@ -296,7 +296,7 @@ export class FloorScene {
     }
 
     spawnCustomer() {
-        if (this.customers.length + this.telegraphedCustomers.length >= 5) return;
+        if (this.customers.length + this.telegraphedCustomers.length >= 4) return;
 
         const typeId = this.levelConfig.customerTypes[Math.floor(Math.random() * this.levelConfig.customerTypes.length)];
         const config = CUSTOMER_TYPES[typeId];
