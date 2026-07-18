@@ -109,6 +109,15 @@ export class LaphingScene {
         }
     }
 
+    _onConfirmClick() {
+        if (this.step === 5) {
+            // "Add to Bowl" — transition to bowl view
+            this._advanceTo(6);
+        } else if (this.step === 6) {
+            this.confirm();
+        }
+    }
+
     _advanceTo(step) {
         const prevStep = this.step;
         this.step = step;

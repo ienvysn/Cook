@@ -21,28 +21,28 @@ export class Customer {
 
         this.order = new Order(orderType, 1, requestedToppings);
         this.maxPatienceMs = typeConfig.basePatienceMs;
-        this.patienceMs    = this.maxPatienceMs;
-        this.element       = null;
+        this.patienceMs = this.maxPatienceMs;
+        this.element = null;
 
         // Pick a random sprite from the type's sprite list
         const sprites = typeConfig.sprites || [];
-        this.sprite       = sprites[Math.floor(Math.random() * sprites.length)] || null;
+        this.sprite = sprites[Math.floor(Math.random() * sprites.length)] || null;
         this.spriteFrames = typeConfig.spriteFrames || 1;
-        this._lastFrame   = -1; // track last frame to avoid unnecessary DOM writes
+        this._lastFrame = -1; // track last frame to avoid unnecessary DOM writes
     }
 
     render(dragManager, onServe) {
         const div = document.createElement('div');
         div.className = 'customer dropzone';
         div.id = this.id;
-        
+
         // Show the final plated image (not raw hotbar icon) in the order bubble
         const item = ITEM_REGISTRY[this.order.baseType];
         let orderIconHtml;
         if (item.verticalSprite && item.sprite) {
             // 1×2 stacked sprite (e.g. laphingbowl): crop to top frame only
             orderIconHtml = `<div style="width:72px;height:56px;border-radius:10px;overflow:hidden;flex-shrink:0;
-                                         background:url('${item.sprite}') 50% 0% / contain no-repeat;background-size:100% 200%;"></div>`;
+                                         background:url('${item.sprite}') 100% 0% / contain no-repeat;background-size:100% 200%;"></div>`;
         } else {
             const src = item.platedIcon || item.sprite;
             orderIconHtml = src
@@ -116,7 +116,7 @@ export class Customer {
             const bar = this.element.querySelector('.patience-bar');
             if (bar) {
                 bar.style.width = `${pct * 100}%`;
-                if (pct < 0.30)      bar.style.background = '#e74c3c';
+                if (pct < 0.30) bar.style.background = '#e74c3c';
                 else if (pct < 0.60) bar.style.background = '#f39c12';
             }
 
